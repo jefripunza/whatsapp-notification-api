@@ -1,0 +1,6 @@
+{
+  "ignore": ["*.json", "frontend/*"],
+  "watch": ["./"],
+  "exec": "node .",
+  "ext": "js"
+}

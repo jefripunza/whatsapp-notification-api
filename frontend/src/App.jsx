@@ -1,35 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = ({ children }) => {
+  useEffect(() => {
+    // handle anchor button
+    document.addEventListener("click", function (event) {
+      event.preventDefault(); // Don't navigate!
+      const anchor = event.target.closest("a"); // Find closest Anchor (or self)
+      if (!anchor) return; // Not found. Exit here.
+      const href = anchor.getAttribute("href");
+      const target = anchor.getAttribute("target");
+      if (String(href).startsWith("#")) {
+        const id = String(href).replaceAll("#", "");
+        if (document.getElementById(id)) {
+          document.getElementById(id).scrollIntoView({
+            behavior: "smooth",
+          });
+        }
+      } else if (target === "_blank") {
+        window.open(href, "_blank").focus();
+      }
+    });
+    // ===========================================================
+    document.documentElement.scrollTop = 0;
+    document.scrollingElement.scrollTop = 0;
+  }, []);
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+  return children;
+};
 
-export default App
+export default App;

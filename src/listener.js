@@ -1,11 +1,33 @@
 const WAWebJS = require("whatsapp-web.js");
-const CryptoJS = require("crypto-js");
+const SocketIO = require("socket.io");
+const qr_image = require("qr-image");
 
 /**
- *
+ * WhatsApp Listener
  * @param {WAWebJS.Client} client
+ * @param {SocketIO.Server} io
  */
-module.exports = (client) => {
+module.exports = (client, io) => {
+  client.on("qr", (qr) => {
+    qr = qr_image.imageSync(qr, { type: "png" });
+    qr = btoa(
+      new Uint8Array(qr).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        ""
+      )
+    );
+    io.emit("qr", qr);
+  });
+  client.on("loading_screen", (percent, message) => {
+    io.emit("loading_screen", `${message} ${percent}%`);
+  });
+  client.on("authenticated", () => {
+    io.emit("authenticated", true);
+  });
+  client.on("disconnected", (reason) => {
+    io.emit("authenticated", false);
+  });
+
   client.on("message", (message) => {
     if (message.body === "!ping") {
       message.reply("pong");

@@ -11,11 +11,13 @@ const {
 } = require("whatsapp-web.js");
 
 const qrcode = require("qrcode-terminal");
+const qr_image = require("qr-image");
 
 class WhatsApp {
   is_ready = false;
   is_authenticated = false;
   auth_failure_reason = null;
+  qr_image = null;
 
   constructor(clientId = "my-self") {
     const client = new Client({
@@ -26,6 +28,17 @@ class WhatsApp {
     client.on("loading_screen", (percent, message) => {
       console.log("WhatsApp: LOADING SCREEN", percent, message);
     });
+    client.on("qr", (qr) => {
+      this.is_ready = false;
+      qr = qr_image.imageSync(qr, { type: "png" });
+      qr = btoa(
+        new Uint8Array(qr).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ""
+        )
+      );
+      this.qr_image = qr;
+    });
     client.on("authenticated", () => {
       console.log("WhatsApp: AUTHENTICATED");
       this.is_authenticated = true;
@@ -33,6 +46,7 @@ class WhatsApp {
     client.on("ready", async () => {
       console.log("WhatsApp is ready!");
       this.is_ready = true;
+      this.qr_image = null;
     });
     client.on("auth_failure", (msg) => {
       console.error("WhatsApp: AUTHENTICATION FAILURE", msg);
@@ -44,16 +58,14 @@ class WhatsApp {
       process.exit(1);
     });
 
-    global.whatsapp = client;
-    this._client = client;
-    return client;
+    this.client = client;
+    global.whatsapp = this;
+    return this;
   }
 
-  QRCodeTerminal(cb = false) {
-    this._client.on("qr", (qr) => {
-      if (cb) cb(qr);
+  QRCodeTerminal() {
+    this.client.on("qr", (qr) => {
       qrcode.generate(qr, { small: true });
-      this.is_ready = false;
     });
   }
 
@@ -76,7 +88,7 @@ class WhatsApp {
    */
   async sendMedia(chatId, mimetype, base64Image) {
     if (!this.is_ready) return [true, "whatsapp not ready"];
-    await this._client.sendMessage(
+    await this.client.sendMessage(
       chatId,
       new MessageMedia(mimetype, base64Image)
     );
@@ -104,7 +116,7 @@ class WhatsApp {
    */
   async sendLocation(chatId, latitude, longitude, description = undefined) {
     if (!this.is_ready) return [true, "whatsapp not ready"];
-    await this._client.sendMessage(
+    await this.client.sendMessage(
       chatId,
       new Location(latitude, longitude, description)
     );
@@ -130,7 +142,7 @@ class WhatsApp {
    */
   async sendContact(chatId) {
     if (!this.is_ready) return [true, "whatsapp not ready"];
-    await this._client.sendMessage(chatId);
+    await this.client.sendMessage(chatId);
     return [false, null];
   }
 
@@ -170,7 +182,7 @@ class WhatsApp {
     //   },
     // ];
     if (!this.is_ready) return [true, "whatsapp not ready"];
-    await this._client.sendMessage(
+    await this.client.sendMessage(
       chatId,
       new List(body, buttonText, sections, title, footer)
     );
@@ -197,7 +209,7 @@ class WhatsApp {
     footer = undefined
   ) {
     if (!this.is_ready) return [true, "whatsapp not ready"];
-    await this._client.sendMessage(
+    await this.client.sendMessage(
       chatId,
       new Buttons(body, buttons, title, footer)
     );
