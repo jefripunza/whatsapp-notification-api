@@ -25,7 +25,7 @@ app.get("/", async (req, res) => {
     })
     .pluck("id");
   const total_data = ids.length;
-  const data = await Database(tables.templates)
+  let data = await Database(tables.templates)
     .select("*")
     .whereIn("id", ids)
     .limit(show)
@@ -39,14 +39,15 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  const { key, sample, example } = req.body;
+  let { key, sample, example } = req.body;
+
   if (!(key && sample && example)) {
     return res.status(400).json({
       message: "body is'n complete!",
     });
   }
   try {
-    JSON.parse(example);
+    example = JSON.parse(example);
   } catch (error) {
     return res.status(400).json({
       message: "example is'n json format!",
@@ -59,18 +60,75 @@ app.post("/", async (req, res) => {
     .first();
   if (isExist) {
     return res.status(400).json({
-      message: "key exist!",
+      message: "key is exist on database!",
     });
   }
 
   await Database(tables.templates).insert({
     key,
     sample,
-    example,
+    example_data: example,
   });
 
   return res.json({
     message: "success create template!",
+  });
+});
+
+app.put("/:key", async (req, res) => {
+  const { key } = req.params;
+  let { sample, example } = req.body;
+
+  if (!(sample && example)) {
+    return res.status(400).json({
+      message: "body is'n complete!",
+    });
+  }
+  try {
+    example = JSON.parse(example);
+  } catch (error) {
+    return res.status(400).json({
+      message: "example is'n json format!",
+    });
+  }
+
+  const isExist = await Database(tables.templates)
+    .select("id")
+    .where("key", key)
+    .first();
+  if (isExist) {
+    return res.status(400).json({
+      message: "key is exist on database!",
+    });
+  }
+
+  await Database(tables.templates).where("key", key).insert({
+    sample,
+    example_data: example,
+  });
+
+  return res.json({
+    message: "success update template!",
+  });
+});
+
+app.delete("/:key", async (req, res) => {
+  const { key } = req.params;
+
+  const isExist = await Database(tables.templates)
+    .select("id")
+    .where("key", key)
+    .first();
+  if (!isExist) {
+    return res.status(400).json({
+      message: "key is'n exist on database!",
+    });
+  }
+
+  await Database(tables.templates).where("key", key).delete();
+
+  return res.json({
+    message: "success remove template!",
   });
 });
 

@@ -31,7 +31,6 @@ const Table = ({
 
   const getData = async () => {
     if (!onProcess) return;
-    console.log("disini...", { onProcess, url });
     try {
       const result = await axios({
         url: `${URL}${url}`,
@@ -39,10 +38,14 @@ const Table = ({
           page: paging,
           show,
         },
-      }).then((res) => res.data);
-      console.log({ result });
-      setData(result.data);
-      setLastPage(result.total_page);
+      });
+      const { data, total_page } = result.data;
+      console.log("pagination:", {
+        url: result.request.responseURL,
+        response_data: data,
+      });
+      setData(data);
+      setLastPage(total_page);
     } catch (error) {
       console.log({ error });
     } finally {
@@ -71,7 +74,12 @@ const Table = ({
               paddingRight: 8,
               cursor: "pointer",
             }}
-            onClick={addButton}
+            onClick={() => {
+              addButton(() => {
+                setOnProcess(true);
+                getData();
+              });
+            }}
           >
             <span className="material-icons-sharp">add</span>
             <h3>{addButtonText ?? "Add Item"}</h3>
@@ -113,7 +121,12 @@ const Table = ({
                     <span
                       className="warning material-icons-sharp"
                       style={{ margin: 5, cursor: "pointer" }}
-                      onClick={() => actionUpdate(data)}
+                      onClick={() =>
+                        actionUpdate(data, () => {
+                          setOnProcess(true);
+                          getData();
+                        })
+                      }
                     >
                       edit
                     </span>
@@ -122,7 +135,12 @@ const Table = ({
                     <span
                       className="danger material-icons-sharp"
                       style={{ margin: 5, cursor: "pointer" }}
-                      onClick={() => actionDelete(data)}
+                      onClick={() =>
+                        actionDelete(data, () => {
+                          setOnProcess(true);
+                          getData();
+                        })
+                      }
                     >
                       delete
                     </span>

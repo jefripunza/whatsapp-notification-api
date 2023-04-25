@@ -2,3 +2,6 @@ node_modules
 .wwebjs_auth
 .env
 temp
+
+gpt.js
+test.js

@@ -51,6 +51,10 @@
   color: white;
 }
 
+.monospace-text {
+  font-family: 'Lucida Console', monospace;
+}
+
 /* ==================== DARK THEME VARAIABLES =================== */
 .dark-theme-variables {
   --color-dark: #edeffd;
@@ -262,7 +266,7 @@ textarea {
   gap: 1.6rem;
 }
 
-.template-col > div > form {
+.template-col > .template-form {
   padding-bottom: 30px;
 }
 

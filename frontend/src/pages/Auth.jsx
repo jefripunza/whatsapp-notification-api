@@ -9,7 +9,8 @@ function Auth() {
 
   const [message, setMessage] = useState("Please wait!");
 
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isSocketConnected, setSocketConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(false);
   const [whatsappReady, setWhatsAppReady] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [qr_svg, setQR] = useState(false);

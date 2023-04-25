@@ -24,6 +24,10 @@ module.exports = (client, io) => {
   client.on("authenticated", () => {
     io.emit("authenticated", true);
   });
+  client.on("ready", async () => {
+    const { is_ready, is_authenticated, my } = global.whatsapp;
+    io.emit("init", { whatsapp_ready: is_ready, is_authenticated, my });
+  });
   client.on("disconnected", (reason) => {
     io.emit("authenticated", false);
   });

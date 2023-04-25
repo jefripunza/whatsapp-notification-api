@@ -12,9 +12,8 @@ module.exports = (io) => {
     //   console.log(`user ${id} disconnected`);
     // });
 
-    const { is_ready, is_authenticated, qr_image } = global.whatsapp;
-
-    socket.emit("init", { whatsapp_ready: is_ready, is_authenticated });
+    const { is_ready, is_authenticated, qr_image, my } = global.whatsapp;
+    socket.emit("init", { whatsapp_ready: is_ready, is_authenticated, my });
     if (qr_image) socket.emit("qr", qr_image);
   });
 };

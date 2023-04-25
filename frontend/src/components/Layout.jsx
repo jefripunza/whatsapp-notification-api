@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { socket } from "../socket";
 import { URL } from "../config";
 
 import routes from "../routes";
@@ -9,32 +10,67 @@ const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [isSocketConnected, setSocketConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(false);
+  useEffect(() => {
+    function onConnect() {
+      setIsConnected(true);
+    }
+    function onDisconnect() {
+      setIsConnected(false);
+    }
+    function onInit(init) {
+      console.log({ init });
+    }
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("init", onInit);
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("init", onInit);
+    };
+  }, []);
+
   useEffect(() => {
     const sideMenu = document.querySelector("aside");
-    const menuBtn = document.querySelector("#menu-btn");
-    const closeBtn = document.querySelector("#close-btn");
-    const themeToggler = document.querySelector(".theme-toggler");
-
     // Show Sidebar
+    const menuBtn = document.querySelector("#menu-btn");
     menuBtn.addEventListener("click", () => {
       sideMenu.style.display = "block";
     });
     // Close Sidebar
+    const closeBtn = document.querySelector("#close-btn");
     closeBtn.addEventListener("click", () => {
       sideMenu.style.display = "none";
     });
-
-    //Change Theme
-    themeToggler.addEventListener("click", () => {
-      document.body.classList.toggle("dark-theme-variables");
-      themeToggler
-        .querySelector("span:nth-child(1)")
-        .classList.toggle("active");
-      themeToggler
-        .querySelector("span:nth-child(2)")
-        .classList.toggle("active");
-    });
   }, []);
+
+  // const [isDarkMode, setDarkMode] = useState(
+  //   localStorage.getItem("dark_mode") ?? "false"
+  // );
+  // useEffect(() => {
+  //   //Change Theme
+  //   if (!localStorage.getItem("dark_mode")) {
+  //     localStorage.setItem("dark_mode", "false");
+  //   }
+  //   const themeToggler = document.querySelector(".theme-toggler");
+  //   themeToggler.addEventListener("click", () => {
+  //     document.body.classList.toggle("dark-theme-variables");
+  //     // themeToggler
+  //     //   .querySelector("span:nth-child(1)")
+  //     //   .classList.toggle("active");
+  //     // themeToggler
+  //     //   .querySelector("span:nth-child(2)")
+  //     //   .classList.toggle("active");
+  //     let switching = "false";
+  //     if (isDarkMode == "false") {
+  //       switching = "true";
+  //     }
+  //     setDarkMode(switching);
+  //     localStorage.setItem("dark_mode", switching);
+  //   });
+  // }, []);
 
   function addMenu(route, name, icon, number = null) {
     return (
@@ -102,10 +138,22 @@ const Layout = ({ children }) => {
           <button id="menu-btn">
             <span className="material-icons-sharp">menu</span>
           </button>
-          <div className="theme-toggler">
-            <span className="material-icons-sharp active">light_mode</span>
-            <span className="material-icons-sharp">dark_mode</span>
-          </div>
+          {/* <div className="theme-toggler">
+            <span
+              className={
+                "material-icons-sharp" + (isDarkMode == "true" ? "" : " active")
+              }
+            >
+              light_mode
+            </span>
+            <span
+              className={
+                "material-icons-sharp" + (isDarkMode == "true" ? " active" : "")
+              }
+            >
+              dark_mode
+            </span>
+          </div> */}
           <div className="profile">
             <div className="info">
               <p>

@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const App = ({ children }) => {
   useEffect(() => {
     // handle anchor button
@@ -25,7 +28,23 @@ const App = ({ children }) => {
     document.scrollingElement.scrollTop = 0;
   }, []);
 
-  return children;
+  return (
+    <>
+      {children}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </>
+  );
 };
 
 export default App;

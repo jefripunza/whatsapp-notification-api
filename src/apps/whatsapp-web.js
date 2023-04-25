@@ -18,6 +18,7 @@ class WhatsApp {
   is_authenticated = false;
   auth_failure_reason = null;
   qr_image = null;
+  info = null;
 
   constructor(clientId = "my-self") {
     const client = new Client({
@@ -47,6 +48,10 @@ class WhatsApp {
       console.log("WhatsApp is ready!");
       this.is_ready = true;
       this.qr_image = null;
+      this.my = {
+        name: client.info.pushname,
+        number: client.info.me.user,
+      };
     });
     client.on("auth_failure", (msg) => {
       console.error("WhatsApp: AUTHENTICATION FAILURE", msg);
