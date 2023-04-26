@@ -47,7 +47,12 @@ module.exports = (client, io) => {
     if (msg.body === "!ping") {
       msg.reply("pong");
       // client.sendMessage(msg.from, "pong");
-    } else if (String(msg.body).includes("@everyone")) {
+    }
+  });
+
+  client.on("message_create", async (msg) => {
+    // Fired on all message creations, including your own
+    if (String(msg.body).includes("@everyone")) {
       await delay();
       const chat = await msg.getChat();
       let text = "╠➥ *#ijin* tak bantuin Spawn org2 disini... 🙏🏻\n";
