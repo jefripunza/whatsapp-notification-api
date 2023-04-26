@@ -30,8 +30,8 @@ jobs:
             - name: F&R - DASHBOARD_ROOT
               uses: jacobtomlinson/gha-find-replace@v2
               with:
-                  find: "DASHBOARD_ROOT"
-                  replace: ${{ secrets.ENV_DASHBOARD_ROOT }}
+                  find: "DASHBOARD_ROOT="
+                  replace: "DASHBOARD_ROOT=${{ secrets.ENV_DASHBOARD_ROOT }}"
                   regex: false
                   include: ".env"
 
@@ -40,8 +40,8 @@ jobs:
             - name: F&R - JWT_SECRET_TOKEN
               uses: jacobtomlinson/gha-find-replace@v2
               with:
-                  find: "JWT_SECRET_TOKEN"
-                  replace: ${{ secrets.ENV_JWT_SECRET_TOKEN }}
+                  find: "JWT_SECRET_TOKEN="
+                  replace: "JWT_SECRET_TOKEN=${{ secrets.ENV_JWT_SECRET_TOKEN }}"
                   regex: false
                   include: ".env"
 
@@ -50,26 +50,26 @@ jobs:
             - name: F&R - RABBIT_HOST
               uses: jacobtomlinson/gha-find-replace@v2
               with:
-                  find: "RABBIT_HOST"
-                  replace: ${{ secrets.ENV_RABBIT_HOST }}
+                  find: "RABBIT_HOST="
+                  replace: "RABBIT_HOST=${{ secrets.ENV_RABBIT_HOST }}"
                   regex: false
                   include: ".env"
 
             # ----------------------------------------------------------------------
 
-            # - name: F&R - ENV_REDIS_USER
+            # - name: F&R - REDIS_USER
             #   uses: jacobtomlinson/gha-find-replace@v2
             #   with:
-            #       find: "ENV_REDIS_USER"
-            #       replace: ${{ secrets.ENV_REDIS_USER }}
+            #       find: "REDIS_USER="
+            #       replace: "REDIS_USER=${{ secrets.ENV_REDIS_USER }}"
             #       regex: false
             #       include: ".env"
 
-            # - name: F&R - ENV_REDIS_PASS
+            # - name: F&R - REDIS_PASS
             #   uses: jacobtomlinson/gha-find-replace@v2
             #   with:
-            #       find: "ENV_REDIS_PASS"
-            #       replace: ${{ secrets.ENV_REDIS_PASS }}
+            #       find: "REDIS_PASS="
+            #       replace: "REDIS_PASS=${{ secrets.ENV_REDIS_PASS }}"
             #       regex: false
             #       include: ".env"
 
