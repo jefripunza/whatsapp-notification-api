@@ -9,6 +9,7 @@ const {
   List,
   Buttons,
 } = require("whatsapp-web.js");
+const locateChrome = require("locate-chrome");
 
 const qrcode = require("qrcode-terminal");
 const qr_image = require("qr-image");
@@ -22,6 +23,10 @@ class WhatsApp {
 
   constructor(clientId = "my-self") {
     const client = new Client({
+      puppeteer: {
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      },
       authStrategy: new LocalAuth({ clientId }),
     });
     client.initialize();
@@ -66,7 +71,6 @@ class WhatsApp {
 
     this.client = client;
     global.whatsapp = this;
-    return this;
   }
 
   formatter = (number, standard = "@c.us") => {

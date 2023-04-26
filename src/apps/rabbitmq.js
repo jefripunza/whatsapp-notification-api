@@ -20,7 +20,9 @@ class RabbitMQ {
           .split("://")[1]
           .split("@");
         const [username, password] = String(credential).split(":");
-        const view_host = String(RABBIT_HOST).includes("localhost")
+        const view_host = ["localhost", "host.docker.internal"].some(
+          (localhost_docker) => String(RABBIT_HOST).includes(localhost_docker)
+        )
           ? RABBIT_HOST
           : `amqp://${this.#createHideDot(username)}:${this.#createHideDot(
               password

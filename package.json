@@ -4,6 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "install:fe": "cd frontend && yarn",
+    "build:fe": "cd frontend && yarn build",
+    "remove-module:fe": "cd frontend && rm -rf node_modules",
     "dev": "npx nodemon",
     "start": "node ."
   },
@@ -16,6 +19,7 @@
     "helmet": "^6.1.5",
     "jsonwebtoken": "^9.0.0",
     "knex": "^2.4.2",
+    "locate-chrome": "^0.1.1",
     "morgan": "^1.10.0",
     "qr-image": "^3.2.0",
     "qrcode-terminal": "^0.12.0",

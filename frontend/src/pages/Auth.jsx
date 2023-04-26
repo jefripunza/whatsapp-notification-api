@@ -23,7 +23,7 @@ function Auth() {
         <div className="auth-card">
           <div className="head-card">
             <img
-              src="https://wwebjs.dev/logo.png"
+              src="images/logo.png"
               alt="whatsapp notification api logo"
               style={{ width: "10rem", height: "10rem" }}
             />
