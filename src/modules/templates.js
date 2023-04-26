@@ -8,7 +8,7 @@ const Database = require("../apps/knex");
 const tables = require("../models/tables");
 
 // pagination
-app.get("/", async (req, res) => {
+app.get("/", token_validation, async (req, res) => {
   let { page, show, search } = req.query;
   page = page ?? 1;
   show = show ?? 10;
@@ -38,7 +38,7 @@ app.get("/", async (req, res) => {
   });
 });
 
-app.post("/", async (req, res) => {
+app.post("/", token_validation, async (req, res) => {
   let { key, sample, example } = req.body;
 
   if (!(key && sample && example)) {
@@ -75,7 +75,7 @@ app.post("/", async (req, res) => {
   });
 });
 
-app.put("/:key", async (req, res) => {
+app.put("/:key", token_validation, async (req, res) => {
   const { key } = req.params;
   let { sample, example } = req.body;
 
@@ -112,7 +112,7 @@ app.put("/:key", async (req, res) => {
   });
 });
 
-app.delete("/:key", async (req, res) => {
+app.delete("/:key", token_validation, async (req, res) => {
   const { key } = req.params;
 
   const isExist = await Database(tables.templates)

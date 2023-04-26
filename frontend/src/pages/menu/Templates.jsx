@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
-import ReactLoading from "react-loading";
-import Loading from "../../components/Loading";
 
 import { URL } from "../../config";
+import axios from "../../utils/axios";
 import {
   createModal,
-  showLoading,
   createPopup,
   createDeleteQuestion,
 } from "../../utils/sweetalert2";
 import { getFocusVariable } from "../../helpers";
 
+import Loading from "../../components/Loading";
 import Layout from "../../components/Layout";
 import Table from "../../components/Table";
 

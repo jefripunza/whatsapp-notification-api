@@ -3,12 +3,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import useApplication from "./../hooks/useApplication";
 import axios from "../utils/axios";
 import routes from "../routes";
+import { toast } from "react-toastify";
 
 const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { isAuthenticated, isReady, user } = useApplication();
+  const { isAuthenticated, isReady, user, logout } = useApplication();
 
   useEffect(() => {
     if (!isAuthenticated && !isReady) {
@@ -73,14 +74,12 @@ const Layout = ({ children }) => {
             href="#"
             onClick={async () => {
               try {
-                const result = await axios
-                  .delete("/api/whatsapp/auth/logout", {
-                    headers: {
-                      Authorization: "Bearer ",
-                    },
-                  })
+                await axios
+                  .delete("/api/whatsapp/auth/logout")
                   .then((res) => res.data);
-                console.log({ result });
+                logout();
+                toast.success("success logout!");
+                navigate("/", { replace: true });
               } catch (e) {
                 console.log({ e });
               }

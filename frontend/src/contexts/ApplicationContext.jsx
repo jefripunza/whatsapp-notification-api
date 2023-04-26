@@ -79,6 +79,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         message,
+        qr: null,
       };
     }
     case "ERROR": {
@@ -140,6 +141,9 @@ export const ApplicationProvider = ({ children }) => {
     }
     function onInit({ from, is_authenticated, whatsapp_ready, user }) {
       console.log("context", { from, is_authenticated, whatsapp_ready, user });
+      if (user) {
+        axios.defaults.headers.common.Authorization = `Bearer ${user.token}`;
+      }
       dispatch({
         type: "INIT",
         payload: {
@@ -167,6 +171,9 @@ export const ApplicationProvider = ({ children }) => {
       });
     }
     function onAuthenticated(isAuthenticated) {
+      if (!isAuthenticated) {
+        delete axios.defaults.headers.common.Authorization;
+      }
       dispatch({
         type: "AUTHENTICATION",
         payload: {

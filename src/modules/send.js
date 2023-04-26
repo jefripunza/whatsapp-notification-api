@@ -15,49 +15,45 @@ const tables = require("../models/tables");
 
 const { getFocusVariable } = require("../helpers");
 
-app.post(
-  "/message/raw",
-  // token_validation,
-  async (req, res) => {
-    let { phone_number, message } = req.body;
-    if (!(phone_number && message)) {
-      return res.status(400).json({
-        message: "body is'n complete!",
-      });
-    }
-
-    const { is_ready, is_authenticated, client, formatter } = global.whatsapp;
-    if (!is_ready || !is_authenticated) {
-      return res.status(400).json({
-        message: "whatsapp is'n ready!",
-      });
-    }
-    phone_number = formatter(phone_number);
-
-    try {
-      const isRegister = await client.isRegisteredUser(phone_number);
-      if (!isRegister) {
-        return res.status(400).json({
-          message: "whatsapp is'n registered!",
-        });
-      }
-
-      const Rabbit = new RabbitMQ();
-      await Rabbit.send(
-        RABBIT_MESSAGE_REQUESTS_EXCHANGE,
-        RABBIT_MESSAGE_REQUESTS_QUEUE,
-        { phone_number, message }
-      );
-
-      return res.json({ message: "success send message!" });
-    } catch (error) {
-      console.log({ error });
-      return res.status(500).json({ message: "internal server error!" });
-    }
+app.post("/message/raw", token_validation, async (req, res) => {
+  let { phone_number, message } = req.body;
+  if (!(phone_number && message)) {
+    return res.status(400).json({
+      message: "body is'n complete!",
+    });
   }
-);
 
-app.post("/message/:key/:phone_number", async (req, res) => {
+  const { is_ready, is_authenticated, client, formatter } = global.whatsapp;
+  if (!is_ready || !is_authenticated) {
+    return res.status(400).json({
+      message: "whatsapp is'n ready!",
+    });
+  }
+  phone_number = formatter(phone_number);
+
+  try {
+    const isRegister = await client.isRegisteredUser(phone_number);
+    if (!isRegister) {
+      return res.status(400).json({
+        message: "whatsapp is'n registered!",
+      });
+    }
+
+    const Rabbit = new RabbitMQ();
+    await Rabbit.send(
+      RABBIT_MESSAGE_REQUESTS_EXCHANGE,
+      RABBIT_MESSAGE_REQUESTS_QUEUE,
+      { phone_number, message }
+    );
+
+    return res.json({ message: "success send message!" });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ message: "internal server error!" });
+  }
+});
+
+app.post("/message/:key/:phone_number", token_validation, async (req, res) => {
   let { key, phone_number } = req.params;
   const body = req.body;
   if (Object.keys(body).length == 0) {
