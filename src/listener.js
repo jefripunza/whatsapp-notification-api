@@ -2,6 +2,7 @@ const WAWebJS = require("whatsapp-web.js");
 const SocketIO = require("socket.io");
 const qr_image = require("qr-image");
 const jwt = require("./utils/jwt");
+const { delay } = require("../src/helpers");
 
 /**
  * WhatsApp Listener
@@ -42,10 +43,22 @@ module.exports = (client, io) => {
     io.emit("authenticated", false);
   });
 
-  client.on("message", (message) => {
-    if (message.body === "!ping") {
-      message.reply("pong");
-      // client.sendMessage(message.from, "pong");
+  client.on("message", async (msg) => {
+    if (msg.body === "!ping") {
+      msg.reply("pong");
+      // client.sendMessage(msg.from, "pong");
+    } else if (String(msg.body).includes("@everyone")) {
+      await delay();
+      const chat = await msg.getChat();
+      let text = "╠➥ *#ijin* tak bantuin Spawn org2 disini... 🙏🏻\n";
+      let mentions = [];
+      for (let participant of chat.participants) {
+        const contact = await client.getContactById(participant.id._serialized);
+        mentions.push(contact);
+        text += `@${participant.id.user} `;
+      }
+      text += "\n╚═〘 JeJep BOT 〙";
+      await chat.sendMessage(text, { mentions });
     }
   });
 
