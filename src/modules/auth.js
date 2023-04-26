@@ -4,7 +4,6 @@ const app = express.Router();
 
 const token_validation = require("../middlewares/token_validation");
 
-// logout
 app.delete("/logout", token_validation, (req, res) => {
   return res.json({ message: "success logout!" });
 });

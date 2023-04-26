@@ -9,7 +9,7 @@ const Database = knex(knexfile);
 (async () => {
   Database.raw("SELECT 1")
     .then(() => {
-      console.log("Database connected");
+      console.log("✅ Database connected");
     })
     .catch((e) => {
       console.log("Database not connected");

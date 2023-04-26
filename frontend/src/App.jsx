@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-
+import { ApplicationProvider } from "./contexts/ApplicationContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -30,7 +30,7 @@ const App = ({ children }) => {
 
   return (
     <>
-      {children}
+      <ApplicationProvider>{children}</ApplicationProvider>
       <ToastContainer
         position="top-right"
         autoClose={5000}

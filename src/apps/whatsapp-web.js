@@ -18,7 +18,7 @@ class WhatsApp {
   is_authenticated = false;
   auth_failure_reason = null;
   qr_image = null;
-  info = null;
+  user = null;
 
   constructor(clientId = "my-self") {
     const client = new Client({
@@ -45,12 +45,13 @@ class WhatsApp {
       this.is_authenticated = true;
     });
     client.on("ready", async () => {
-      console.log("WhatsApp is ready!");
+      console.log("✅ WhatsApp is ready!");
       this.is_ready = true;
       this.qr_image = null;
-      this.my = {
+      this.user = {
         name: client.info.pushname,
         number: client.info.me.user,
+        number_format: client.info.me._serialized,
       };
     });
     client.on("auth_failure", (msg) => {
@@ -67,6 +68,26 @@ class WhatsApp {
     global.whatsapp = this;
     return this;
   }
+
+  formatter = (number, standard = "@c.us") => {
+    let formatted = number;
+    // const standard = '@c.us'; // @s.whatsapp.net / @c.us
+    if (!String(formatted).endsWith("@g.us")) {
+      // isGroup ? next
+      // 1. Menghilangkan karakter selain angka
+      formatted = number.replace(/\D/g, "");
+      // 2. Menghilangkan angka 62 di depan (prefix)
+      //    Kemudian diganti dengan 0
+      if (formatted.startsWith("0")) {
+        formatted = "62" + formatted.slice(1);
+      }
+      // 3. Tambahkan standar pengiriman whatsapp
+      if (!String(formatted).endsWith(standard)) {
+        formatted += standard;
+      }
+    }
+    return formatted;
+  };
 
   QRCodeTerminal() {
     this.client.on("qr", (qr) => {

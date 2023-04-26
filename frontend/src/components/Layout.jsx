@@ -1,36 +1,20 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { socket } from "../socket";
-import { URL } from "../config";
-
+import useApplication from "./../hooks/useApplication";
+import axios from "../utils/axios";
 import routes from "../routes";
 
 const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [isSocketConnected, setSocketConnected] = useState(socket.connected);
-  const [isConnected, setIsConnected] = useState(false);
+  const { isAuthenticated, isReady, user } = useApplication();
+
   useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
+    if (!isAuthenticated && !isReady) {
+      navigate("/", { replace: true });
     }
-    function onDisconnect() {
-      setIsConnected(false);
-    }
-    function onInit(init) {
-      console.log({ init });
-    }
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("init", onInit);
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("init", onInit);
-    };
-  }, []);
+  }, [isAuthenticated, isReady]);
 
   useEffect(() => {
     const sideMenu = document.querySelector("aside");
@@ -46,35 +30,10 @@ const Layout = ({ children }) => {
     });
   }, []);
 
-  // const [isDarkMode, setDarkMode] = useState(
-  //   localStorage.getItem("dark_mode") ?? "false"
-  // );
-  // useEffect(() => {
-  //   //Change Theme
-  //   if (!localStorage.getItem("dark_mode")) {
-  //     localStorage.setItem("dark_mode", "false");
-  //   }
-  //   const themeToggler = document.querySelector(".theme-toggler");
-  //   themeToggler.addEventListener("click", () => {
-  //     document.body.classList.toggle("dark-theme-variables");
-  //     // themeToggler
-  //     //   .querySelector("span:nth-child(1)")
-  //     //   .classList.toggle("active");
-  //     // themeToggler
-  //     //   .querySelector("span:nth-child(2)")
-  //     //   .classList.toggle("active");
-  //     let switching = "false";
-  //     if (isDarkMode == "false") {
-  //       switching = "true";
-  //     }
-  //     setDarkMode(switching);
-  //     localStorage.setItem("dark_mode", switching);
-  //   });
-  // }, []);
-
   function addMenu(route, name, icon, number = null) {
     return (
       <a
+        key={route}
         href="#"
         className={location.pathname == route ? "active" : ""}
         onClick={() => navigate(route)}
@@ -102,18 +61,20 @@ const Layout = ({ children }) => {
           </div>
         </div>
         <div className="sidebar">
-          {routes.routes
-            .filter((v) => v.name)
-            .map((route) => {
-              return addMenu(route.path, route.name, route.icon);
-            })}
+          {isReady
+            ? routes.routes
+                .filter((v) => v.name)
+                .map((route) => {
+                  return addMenu(route.path, route.name, route.icon);
+                })
+            : null}
 
           <a
             href="#"
             onClick={async () => {
               try {
                 const result = await axios
-                  .delete(`${URL}/api/whatsapp/auth/logout`, {
+                  .delete("/api/whatsapp/auth/logout", {
                     headers: {
                       Authorization: "Bearer ",
                     },
@@ -131,85 +92,95 @@ const Layout = ({ children }) => {
         </div>
       </aside>
 
-      <main>{children}</main>
+      {isReady ? <main>{children}</main> : <>Please wait...</>}
 
       <div className="right">
         <div className="top">
           <button id="menu-btn">
             <span className="material-icons-sharp">menu</span>
           </button>
-          {/* <div className="theme-toggler">
-            <span
-              className={
-                "material-icons-sharp" + (isDarkMode == "true" ? "" : " active")
-              }
-            >
-              light_mode
-            </span>
-            <span
-              className={
-                "material-icons-sharp" + (isDarkMode == "true" ? " active" : "")
-              }
-            >
-              dark_mode
-            </span>
-          </div> */}
           <div className="profile">
             <div className="info">
               <p>
-                Hey <b>Daniel</b>
+                {isReady ? (
+                  <>
+                    Hey <b>{user.name}</b>
+                  </>
+                ) : (
+                  <b>Welcome...</b>
+                )}
               </p>
-              <small className="text-muted">Admin</small>
+              {isReady ? (
+                <small className="text-muted">+{user.number}</small>
+              ) : null}
             </div>
             <div className="profile-photo">
-              <img src="images/profile-1.jpg" alt="" />
+              <img
+                src={isReady ? user.picture : "images/blank-profile.webp"}
+                alt=""
+              />
             </div>
           </div>
         </div>
 
-        <div className="recent-updates">
-          <h2>Recent Updates</h2>
+        <div className="notifications">
+          <h2>Notifications</h2>
           <div className="updates">
-            <div className="update">
-              <div className="profile-photo">
-                <img src="images/profile-2.jpg" alt="" />
-              </div>
-              <div className="message">
-                <p>
-                  <b>Mike Tyson</b> received his order of Night lion tech GPS
-                  drone
-                </p>
-                <small>2 Minutes Ago</small>
-              </div>
-            </div>
+            {isReady ? (
+              <>
+                <div className="update">
+                  <div className="profile-photo">
+                    <img src="images/profile-2.jpg" alt="" />
+                  </div>
+                  <div className="message">
+                    <p>
+                      <b>Mike Tyson</b> received his order of Night lion tech
+                      GPS drone
+                    </p>
+                    <small>2 Minutes Ago</small>
+                  </div>
+                </div>
 
-            <div className="update">
-              <div className="profile-photo">
-                <img src="images/profile-3.jpg" alt="" />
-              </div>
-              <div className="message">
-                <p>
-                  <b>Diana Ayi</b> received her order of 2 DJI Air drone
-                </p>
-                <small>5 Minutes Ago</small>
-              </div>
-            </div>
+                <div className="update">
+                  <div className="profile-photo">
+                    <img src="images/profile-3.jpg" alt="" />
+                  </div>
+                  <div className="message">
+                    <p>
+                      <b>Diana Ayi</b> received her order of 2 DJI Air drone
+                    </p>
+                    <small>5 Minutes Ago</small>
+                  </div>
+                </div>
 
-            <div className="update">
-              <div className="profile-photo">
-                <img src="images/profile-4.jpg" alt="" />
+                <div className="update">
+                  <div className="profile-photo">
+                    <img src="images/profile-4.jpg" alt="" />
+                  </div>
+                  <div className="message">
+                    <p>
+                      <b>Mandy Roy</b> received his order of LARVENDER KF102
+                      drone
+                    </p>
+                    <small>6 Minutes Ago</small>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="update">
+                <div className="profile-photo">
+                  <img src="images/profile-2.jpg" alt="" />
+                </div>
+                <div className="message">
+                  <p>if you not scan</p>
+                  <small>2 Minutes Ago</small>
+                </div>
               </div>
-              <div className="message">
-                <p>
-                  <b>Mandy Roy</b> received his order of LARVENDER KF102 drone
-                </p>
-                <small>6 Minutes Ago</small>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        <div className="sales-analytics">
+        {/* <div className="sales-analytics">
           <h2>Sales Analytics</h2>
           <div className="item online">
             <div className="icon">
@@ -259,7 +230,7 @@ const Layout = ({ children }) => {
               <h3>Add Product</h3>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

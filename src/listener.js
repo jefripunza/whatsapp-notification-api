@@ -1,6 +1,7 @@
 const WAWebJS = require("whatsapp-web.js");
 const SocketIO = require("socket.io");
 const qr_image = require("qr-image");
+const jwt = require("./utils/jwt");
 
 /**
  * WhatsApp Listener
@@ -25,8 +26,17 @@ module.exports = (client, io) => {
     io.emit("authenticated", true);
   });
   client.on("ready", async () => {
-    const { is_ready, is_authenticated, my } = global.whatsapp;
-    io.emit("init", { whatsapp_ready: is_ready, is_authenticated, my });
+    const { is_ready, is_authenticated, client, user } = global.whatsapp;
+    if (user) {
+      user.token = jwt.createToken(user);
+      user.picture = await client.getProfilePicUrl(client.info.me._serialized);
+    }
+    io.emit("init", {
+      from: "listener.js",
+      whatsapp_ready: is_ready,
+      is_authenticated,
+      user,
+    });
   });
   client.on("disconnected", (reason) => {
     io.emit("authenticated", false);

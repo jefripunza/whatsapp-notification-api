@@ -1,0 +1,2 @@
+MESSAGE_REQUESTS_EXCHANGE=message-requests-exchange
+MESSAGE_REQUESTS_QUEUE=message-requests-queue

@@ -5,10 +5,12 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 
-const { frontend_dir, cors_frontend } = require("../config");
+const { PORT, frontend_dir, cors_frontend } = require("../config");
 
 const app = express();
 const server = http.createServer(app);
+
+server.listen(PORT, () => console.log(`✅ Server listen at ${PORT}`));
 const io = new Server(server, {
   cors: {
     origin: cors_frontend,
@@ -28,6 +30,7 @@ app.get("/", (_, res) => res.sendFile(path.join(frontend_dir, "index.html")));
 app.use(require("morgan")("dev"));
 app.use("/api/whatsapp", require("../modules/auth"));
 app.use("/api/whatsapp", require("../modules/templates"));
+app.use("/api/whatsapp", require("../modules/send"));
 
 // error handlers
 app.get("*", (req, res) => {

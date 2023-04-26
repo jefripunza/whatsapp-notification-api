@@ -24,7 +24,7 @@ export default createBrowserRouter([
     name: "Templates",
     element: <Templates />,
     icon: "receipt_long",
-    errorElement: <ErrorPage />,
+    // errorElement: <ErrorPage />,
   },
   {
     path: "/messages",

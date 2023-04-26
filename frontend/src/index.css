@@ -488,17 +488,17 @@ main table tbody:last-child tr:last-child td {
   text-align: right;
 }
 
-.right .recent-updates .updates {
+.right .notifications .updates {
   background: var(--color-white);
   padding: var(--Card-padding);
   border-radius: var(--card-border-radius);
   box-shadow: var(--box-shadow);
   transition: all 300ms ease;
 }
-.right .recent-updates .updates:hover {
+.right .notifications .updates:hover {
   box-shadow: none;
 }
-.right .recent-updates .updates .update {
+.right .notifications .updates .update {
   display: grid;
   grid-template-columns: 2.6rem auto;
   gap: 1rem;
