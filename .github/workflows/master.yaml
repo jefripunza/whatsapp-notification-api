@@ -44,7 +44,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"*#> REPORTER <#*\nOWNER ➥ *${{ github.repository_owner }}*\nREPO ➥ *${{ github.event.repository.name }}*\nPUSHER ➥ *${{ github.event.pusher.name }}*\nSHA ➥ *${{ github.sha }}*\nSTATUS ➥ *STARING*\nTIME ➥ *${{ github.sha }}*\"
+              \"message\": \"*#> REPORTER <#*\nOWNER ➥ *${{ github.repository_owner }}*\nREPO ➥ *${{ github.event.repository.name }}*\nPUSHER ➥ *${{ github.event.pusher.name }}*\nSHA ➥ *${{ github.sha }}*\nSTATUS ➥ *STARING*\nTIME ➥ *${{ env.start_date }}*\"
             }"
 
       # ----------------------------------------------------------------------
