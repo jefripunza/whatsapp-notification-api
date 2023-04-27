@@ -130,7 +130,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data '{
                 "phone_number": "${{ secrets.REPORT_PHONE_NUMBER }}",
-                "message": "$GITHUB_WORKFLOW deployed with $GITHUB_JOB/$GITHUB_RUN_NUMBER: $GITHUB_JOB_STATUS\ntime=*$(date)*"
+                "message": "${{ env.GITHUB_WORKFLOW }} failed with ${{ env.GITHUB_JOB }}/${{ env.GITHUB_RUN_NUMBER }}: ${{ env.GITHUB_JOB_STATUS }}\ntime=*${{ formatTime(now(), 'YYYY-MM-DDTHH:mm:ssZ') }}*"
             }'
       # If there is a failure, send a report
       - name: Send failure report
@@ -141,7 +141,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data '{
                 "phone_number": "${{ secrets.REPORT_PHONE_NUMBER }}",
-                "message": "$GITHUB_WORKFLOW failed with $GITHUB_JOB/$GITHUB_RUN_NUMBER: $GITHUB_JOB_STATUS\ntime=*$(date)*"
+                "message": "${{ env.GITHUB_WORKFLOW }} failed with ${{ env.GITHUB_JOB }}/${{ env.GITHUB_RUN_NUMBER }}: ${{ env.GITHUB_JOB_STATUS }}\ntime=*${{ formatTime(now(), 'YYYY-MM-DDTHH:mm:ssZ') }}*"
             }'
 
       # ----------------------------------------------------------------------
