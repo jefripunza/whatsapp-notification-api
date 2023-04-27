@@ -84,6 +84,8 @@ module.exports = (client, io) => {
         name: chat.name,
         id_serialized: chat.id._serialized,
       };
+
+      // penjagaan processing dan kebutuhan sync contact
       const isGroupExist = await Database(tables.groups)
         .select("id", "is_process", "is_sync")
         .where("id_serialized", group_data.id_serialized)
@@ -125,18 +127,16 @@ module.exports = (client, io) => {
             .update({ is_sync: false });
         }
       }
-    }
 
-    if (chat.isGroup && String(text).includes("@")) {
-      // Fired on all message creations, including your own
-      const group_data = {
-        name: chat.name,
-        id_serialized: chat.id._serialized,
-      };
-
-      const clubs = await Database(tables.clubs).pluck("name");
-      const at_sign = getAtSignVariable(text, ["everyone"]);
-      const club_available = clubs.filter((club) => at_sign.includes(club));
+      /**
+       * @type{string[]}
+       */
+      let club_available = [];
+      if (String(text).includes("@")) {
+        const clubs = await Database(tables.clubs).pluck("name");
+        const at_sign = getAtSignVariable(text, ["everyone"]);
+        club_available = clubs.filter((club) => at_sign.includes(club));
+      }
 
       // limiter
       if (String(text).includes("@everyone") || club_available.length > 0) {
@@ -163,6 +163,7 @@ module.exports = (client, io) => {
         }
       }
 
+      // Fired on all message creations, including your own
       if (club_available.length > 0) {
         let contacts = await Database(tables.contacts)
           .select(
@@ -217,6 +218,7 @@ module.exports = (client, io) => {
           text += "\n\n";
         }
         text += "\n╚═〘 JeJep BOT 〙";
+        if (mentions.length == 0) return; // skip, nggak ada yg di mention...
         const Rabbit = new RabbitMQ();
         await Rabbit.send(MENTION_PARTIAL_EXCHANGE, {
           id_serialized: group_data.id_serialized,

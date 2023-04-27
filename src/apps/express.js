@@ -33,6 +33,7 @@ app.use("/api/whatsapp", require("../modules/club"));
 app.use("/api/whatsapp", require("../modules/contact"));
 app.use("/api/whatsapp", require("../modules/group"));
 app.use("/api/whatsapp", require("../modules/send"));
+app.use("/api/whatsapp", require("../modules/task"));
 app.use("/api/whatsapp", require("../modules/templates"));
 
 // error handlers
