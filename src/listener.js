@@ -64,6 +64,17 @@ module.exports = (client, io) => {
   });
 
   client.on("message_create", async (msg) => {
+    // check kapan di kirim, jangan ambil history, terblokir ntar
+    const now = new Date();
+    const time_save = new Date();
+    time_save.setMinutes(time_save.getMinutes() - 1);
+    const date_message = new Date(msg._data.t * 1000);
+    if (time_save.getTime() >= date_message.getTime()) {
+      console.log("history goblox...", date_message.toString());
+      return;
+    }
+    console.log(time_save.toString(), ">=", date_message.toString());
+
     const participant_serialized = msg._data.id.participant;
     const text = msg.body;
     const chat = await msg.getChat();
@@ -130,7 +141,6 @@ module.exports = (client, io) => {
       // limiter
       if (String(text).includes("@everyone") || club_available.length > 0) {
         if (!msg.fromMe) {
-          const now = new Date();
           const requests = await Database(tables.request_limiter)
             .where("number_serialized", participant_serialized)
             .where("expired_at", ">=", now);
