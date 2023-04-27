@@ -256,13 +256,6 @@ module.exports = (client, io) => {
   // ==========================================================
   // ==========================================================
 
-  // client.on("message_create", (msg) => {
-  //   // Fired on all message creations, including your own
-  //   if (msg.fromMe) {
-  //     // do stuff here
-  //   }
-  // });
-
   // client.on("message_revoke_everyone", async (after, before) => {
   //   // Fired whenever a message is deleted by anyone (including you)
   //   console.log({ after }); // message after it was deleted.

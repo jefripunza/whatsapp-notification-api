@@ -116,3 +116,34 @@ jobs:
           docker-compose pull
           docker-compose up --force-recreate --build -d
           docker image prune -f
+
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+
+      # If there is a success, send a report
+      - name: Send success report
+        if: success()
+        run: |
+          curl --location '${{ secrets.REPORT_TARGET_URL }}' \
+            --header 'Content-Type: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
+            --data '{
+                "phone_number": "${{ secrets.REPORT_PHONE_NUMBER }}",
+                "message": "$GITHUB_WORKFLOW deployed with $GITHUB_JOB/$GITHUB_RUN_NUMBER: $GITHUB_JOB_STATUS\ntime=*$(date)*"
+            }'
+      # If there is a failure, send a report
+      - name: Send failure report
+        if: failure()
+        run: |
+          curl --location '${{ secrets.REPORT_TARGET_URL }}' \
+            --header 'Content-Type: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
+            --data '{
+                "phone_number": "${{ secrets.REPORT_PHONE_NUMBER }}",
+                "message": "$GITHUB_WORKFLOW failed with $GITHUB_JOB/$GITHUB_RUN_NUMBER: $GITHUB_JOB_STATUS\ntime=*$(date)*"
+            }'
+
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
