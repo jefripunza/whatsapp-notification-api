@@ -12,6 +12,28 @@ const tables = require("../models/tables");
 
 const { getFocusVariable } = require("../helpers");
 
+app.post("/message/report", token_validation, async (req, res) => {
+  let { phone_number, message } = req.body;
+  if (!(phone_number && message)) {
+    return res.status(400).json({
+      message: "body is'n complete!",
+    });
+  }
+
+  try {
+    const Rabbit = new RabbitMQ();
+    await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
+      phone_number,
+      message,
+    });
+
+    return res.json({ message: "reported!" });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ message: "internal server error!" });
+  }
+});
+
 app.post("/message/raw", token_validation, async (req, res) => {
   let { phone_number, message } = req.body;
   if (!(phone_number && message)) {
