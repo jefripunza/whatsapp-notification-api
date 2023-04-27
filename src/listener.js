@@ -8,6 +8,12 @@ const { delay, getAtSignVariable } = require("../src/helpers");
 const Database = require("./apps/knex");
 const tables = require("./models/tables");
 
+const RabbitMQ = require("./apps/rabbitmq");
+const {
+  MENTION_EVERYONE_EXCHANGE,
+  MENTION_PARTIAL_EXCHANGE,
+} = require("./exchange-queue");
+
 /**
  * WhatsApp Listener
  * @param {WAWebJS.Client} client
@@ -58,18 +64,19 @@ module.exports = (client, io) => {
   });
 
   client.on("message_create", async (msg) => {
+    const participant_serialized = msg._data.id.participant;
     const text = msg.body;
     const chat = await msg.getChat();
 
     if (chat.isGroup) {
-      const isGroupExist = await Database(tables.groups)
-        .select("id", "is_process", "is_sync")
-        .where("id_serialized", chat.id._serialized)
-        .first();
       const group_data = {
         name: chat.name,
         id_serialized: chat.id._serialized,
       };
+      const isGroupExist = await Database(tables.groups)
+        .select("id", "is_process", "is_sync")
+        .where("id_serialized", group_data.id_serialized)
+        .first();
       if (!isGroupExist) {
         await Database(tables.groups).insert(group_data);
         console.log("New Group", group_data);
@@ -111,9 +118,40 @@ module.exports = (client, io) => {
 
     if (chat.isGroup && String(text).includes("@")) {
       // Fired on all message creations, including your own
+      const group_data = {
+        name: chat.name,
+        id_serialized: chat.id._serialized,
+      };
+
       const clubs = await Database(tables.clubs).pluck("name");
       const at_sign = getAtSignVariable(text, ["everyone"]);
       const club_available = clubs.filter((club) => at_sign.includes(club));
+
+      // limiter
+      if (String(text).includes("@everyone") || club_available.length > 0) {
+        if (!msg.fromMe) {
+          const now = new Date();
+          const requests = await Database(tables.request_limiter)
+            .where("number_serialized", participant_serialized)
+            .where("expired_at", ">=", now);
+          console.log({
+            participant_serialized,
+            requests_length: requests.length,
+          });
+          if (requests.length < 3) {
+            console.log("Insert to limiter...", { participant_serialized });
+            const expired_at = new Date(now);
+            expired_at.setMinutes(expired_at.getMinutes() + 1);
+            await Database(tables.request_limiter).insert({
+              number_serialized: participant_serialized,
+              expired_at,
+            });
+          } else {
+            // limit
+            return;
+          }
+        }
+      }
 
       if (club_available.length > 0) {
         let contacts = await Database(tables.contacts)
@@ -159,14 +197,22 @@ module.exports = (client, io) => {
           const contacts_of_club = club_of_contact[key];
           for (const contact_serialized of contacts_of_club) {
             const contact = await client.getContactById(contact_serialized);
-            mentions.push(contact);
+            mentions.push({
+              id: {
+                _serialized: contact.id._serialized,
+              },
+            });
             text += `@${String(contact_serialized).split("@")[0]} `;
           }
           text += "\n\n";
         }
         text += "\n╚═〘 JeJep BOT 〙";
-        await delay();
-        await chat.sendMessage(text, { mentions });
+        const Rabbit = new RabbitMQ();
+        await Rabbit.send(MENTION_PARTIAL_EXCHANGE, {
+          id_serialized: group_data.id_serialized,
+          text,
+          mentions,
+        });
       } else {
         if (String(text).includes("@everyone")) {
           let mentions = [];
@@ -175,12 +221,20 @@ module.exports = (client, io) => {
             const contact = await client.getContactById(
               participant.id._serialized
             );
-            mentions.push(contact);
+            mentions.push({
+              id: {
+                _serialized: contact.id._serialized,
+              },
+            });
             text += `@${participant.id.user} `;
           }
           text += "\n╚═〘 JeJep BOT 〙";
-          await delay();
-          await chat.sendMessage(text, { mentions });
+          const Rabbit = new RabbitMQ();
+          await Rabbit.send(MENTION_EVERYONE_EXCHANGE, {
+            id_serialized: group_data.id_serialized,
+            text,
+            mentions,
+          });
         }
       }
     }

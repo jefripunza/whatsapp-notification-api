@@ -1,19 +1,19 @@
 const RabbitMQ = require("../apps/rabbitmq");
-const { MESSAGE_REQUESTS_QUEUE } = require("../exchange-queue");
+const { MENTION_PARTIAL_QUEUE } = require("../exchange-queue");
 const { delay } = require("../helpers");
 
 module.exports = () => {
   const Rabbit = new RabbitMQ();
   Rabbit.listen(
-    MESSAGE_REQUESTS_QUEUE,
-    async ({ phone_number, message }, done, dead) => {
+    MENTION_PARTIAL_QUEUE,
+    async ({ id_serialized, text, mentions }, done, dead) => {
       const { is_ready, is_authenticated, client } = global.whatsapp;
       if (!is_ready || !is_authenticated) {
-        dead();
+        done();
         return;
       }
-      await client.sendMessage(phone_number, message);
-      await delay(5000);
+      await delay(3000);
+      await client.sendMessage(id_serialized, text, { mentions });
       done();
     }
   );

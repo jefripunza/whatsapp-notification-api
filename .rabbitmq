@@ -1,2 +1,8 @@
 MESSAGE_REQUESTS_EXCHANGE=message-requests-exchange
 MESSAGE_REQUESTS_QUEUE=message-requests-queue
+
+MENTION_EVERYONE_EXCHANGE=mention-everyone-exchange
+MENTION_EVERYONE_QUEUE=mention-everyone-queue
+
+MENTION_PARTIAL_EXCHANGE=mention-partial-exchange
+MENTION_PARTIAL_QUEUE=mention-partial-queue

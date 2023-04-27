@@ -3,10 +3,7 @@ const router = express.Router();
 const app = express.Router();
 
 const RabbitMQ = require("../apps/rabbitmq");
-const {
-  RABBIT_MESSAGE_REQUESTS_EXCHANGE,
-  RABBIT_MESSAGE_REQUESTS_QUEUE,
-} = require("../exchange-queue");
+const { MESSAGE_REQUESTS_EXCHANGE } = require("../exchange-queue");
 
 const token_validation = require("../middlewares/token_validation");
 
@@ -40,11 +37,10 @@ app.post("/message/raw", token_validation, async (req, res) => {
     }
 
     const Rabbit = new RabbitMQ();
-    await Rabbit.send(
-      RABBIT_MESSAGE_REQUESTS_EXCHANGE,
-      RABBIT_MESSAGE_REQUESTS_QUEUE,
-      { phone_number, message }
-    );
+    await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
+      phone_number,
+      message,
+    });
 
     return res.json({ message: "success send message!" });
   } catch (error) {
@@ -106,11 +102,10 @@ app.post("/message/:key/:phone_number", token_validation, async (req, res) => {
     }, isExist.sample);
 
     const Rabbit = new RabbitMQ();
-    await Rabbit.send(
-      RABBIT_MESSAGE_REQUESTS_EXCHANGE,
-      RABBIT_MESSAGE_REQUESTS_QUEUE,
-      { phone_number, message: sample_replacer }
-    );
+    await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
+      phone_number,
+      message: sample_replacer,
+    });
 
     return res.json({
       message: "success send message!",

@@ -59,15 +59,10 @@ class RabbitMQ {
   /**
    * Publish message to exchange
    */
-  async send(exchange, queue, msg) {
+  async send(exchange, msg) {
     const routingKey = "";
     try {
       await this.init();
-      // await this.channel.assertExchange(exchange, "direct", {
-      //   durable: true,
-      // });
-      // await this.channel.assertQueue(queue, { durable: true });
-      // await this.channel.bindQueue(queue, exchange, routingKey);
       await this.channel.publish(
         exchange,
         routingKey,
