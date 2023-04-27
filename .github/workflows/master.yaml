@@ -14,30 +14,29 @@ on: # master = production
 env:
   SNAPSHOT_VERSION: ${{ format('{0}-SNAPSHOT', github.event.number) }}
   GITHUB_ISSUE_NUMBER: ${{ github.event.number }}
-  GITHUB_REPO: ${{ github.event.repository.name }}
 
 jobs:
   app-deploy:
     name: 🚚 WhatsApp Notification API - Microservice
     runs-on: server-dell-jefri
     steps:
-      - name: Dump GitHub context
-        id: github_context_step
-        run: echo '${{ toJSON(github) }}'
-      - name: Dump job context
-        run: echo '${{ toJSON(job) }}'
-      - name: Dump steps context
-        run: echo '${{ toJSON(steps) }}'
-      - name: Dump runner context
-        run: echo '${{ toJSON(runner) }}'
-      - name: Dump strategy context
-        run: echo '${{ toJSON(strategy) }}'
-      - name: Dump matrix context
-        run: echo '${{ toJSON(matrix) }}'
+      # - name: Dump GitHub context
+      #   id: github_context_step
+      #   run: echo '${{ toJSON(github) }}'
+      # - name: Dump job context
+      #   run: echo '${{ toJSON(job) }}'
+      # - name: Dump steps context
+      #   run: echo '${{ toJSON(steps) }}'
+      # - name: Dump runner context
+      #   run: echo '${{ toJSON(runner) }}'
+      # - name: Dump strategy context
+      #   run: echo '${{ toJSON(strategy) }}'
+      # - name: Dump matrix context
+      #   run: echo '${{ toJSON(matrix) }}'
 
       - name: Get current date
         run: |
-          echo "start_date=$(date --rfc-3339=date)" >> ${GITHUB_ENV}
+          echo "start_date=$(date +"%Y-%m-%d %T")" >> ${GITHUB_ENV}
       - name: Send start report
         run: |
           curl --insecure --location '${{ secrets.REPORT_TARGET_URL }}' \
@@ -45,7 +44,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"${{ env.GITHUB_REPO }} starting with ${{ env.GITHUB_JOB }}/${{ env.GITHUB_ISSUE_NUMBER }}: ${{ env.GITHUB_JOB_STATUS }}\n#➥ *${{ steps.version.outputs.start_date }}*\"
+              \"message\": \"*#> REPORTER <#*\nOWNER ➥ *${{ github.repository_owner }}*\nREPO ➥ *${{ github.event.repository.name }}*\nPUSHER ➥ *${{ github.event.pusher.name }}*\nSHA ➥ *${{ github.sha }}*\nSTATUS ➥ *STARING*\nTIME ➥ *${{ github.sha }}*\"
             }"
 
       # ----------------------------------------------------------------------
