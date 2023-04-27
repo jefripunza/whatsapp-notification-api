@@ -125,7 +125,7 @@ jobs:
       - name: Send success report
         if: success()
         run: |
-          curl --location '${{ secrets.REPORT_TARGET_URL }}' \
+          curl --insecure --location '${{ secrets.REPORT_TARGET_URL }}' \
             --header 'Content-Type: application/json' \
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data '{
@@ -136,7 +136,7 @@ jobs:
       - name: Send failure report
         if: failure()
         run: |
-          curl --location '${{ secrets.REPORT_TARGET_URL }}' \
+          curl --insecure --location '${{ secrets.REPORT_TARGET_URL }}' \
             --header 'Content-Type: application/json' \
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data '{
