@@ -14,7 +14,6 @@ on: # master = production
 env:
   SNAPSHOT_VERSION: ${{ format('{0}-SNAPSHOT', github.event.number) }}
   GITHUB_ISSUE_NUMBER: ${{ github.event.number }}
-  TZ: Asia/New_York date
 
 jobs:
   app-deploy:
@@ -22,13 +21,11 @@ jobs:
     runs-on: server-dell-jefri
     steps:
       - name: Set Time Zone
-        uses: szenius/set-timezone@v1.1
-        with:
-          timezoneLinux: "Asia/Jakarta"
+        run: |
+          TZ=Asia/Jakarta
 
       - name: Get start datetime
         run: |
-          TZ=Asia/Jakarta
           echo "start_date=$(date +"%Y-%m-%d %T")" >> ${GITHUB_ENV}
       - name: Send start report
         run: |
@@ -117,14 +114,6 @@ jobs:
           regex: false
           include: ".env"
 
-      - name: F&R - RABBIT_HOST
-        uses: jacobtomlinson/gha-find-replace@v2
-        with:
-          find: "RABBIT_HOST="
-          replace: "RABBIT_HOST=${{ secrets.ENV_RABBIT_HOST }}"
-          regex: false
-          include: ".env.anu"
-
       # ----------------------------------------------------------------------
 
       # - name: F&R - REDIS_USER
@@ -147,6 +136,10 @@ jobs:
       # ----------------------------------------------------------------------
       # ----------------------------------------------------------------------
 
+      - name: Test Error
+        run: |
+          anu
+
       - name: 📡 Docker Compose...
         run: |
           docker-compose pull
@@ -160,7 +153,6 @@ jobs:
       - name: Get end datetime
         if: success() || failure()
         run: |
-          TZ=Asia/Jakarta
           echo "end_date=$(date +"%Y-%m-%d %T")" >> ${GITHUB_ENV}
 
       # If there is a success, send a report
