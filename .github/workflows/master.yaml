@@ -23,17 +23,16 @@ jobs:
     steps:
       - name: Get current date
         run: |
-          echo "start_date=$(date +'%Y-%m-%d %H:%M:%s')" >> $GITHUB_OUTPUT
+          echo "start_date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
       - name: Send start report
         run: |
-          PAYLOAD="{
-            \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-            \"message\": \"${{ env.GITHUB_WORKFLOW }} starting with ${{ env.GITHUB_JOB }}/${{ env.GITHUB_RUN_NUMBER }}: ${{ env.GITHUB_JOB_STATUS }}\n#➥ *${{ steps.version.outputs.start_date }}*\"
-          }"
           curl --insecure --location '${{ secrets.REPORT_TARGET_URL }}' \
             --header 'Content-Type: application/json' \
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
-            --data-raw "$PAYLOAD"
+            --data-raw "{
+              \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
+              \"message\": \"${{ env.GITHUB_WORKFLOW }} starting with ${{ env.GITHUB_JOB }}/${{ env.GITHUB_RUN_NUMBER }}: ${{ env.GITHUB_JOB_STATUS }}\n#➥ *${{ steps.version.outputs.start_date }}*\"
+            }"
 
       # ----------------------------------------------------------------------
       # ----------------------------------------------------------------------
