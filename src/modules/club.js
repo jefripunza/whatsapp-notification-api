@@ -80,7 +80,7 @@ app.post("/join", token_validation, async (req, res) => {
 });
 // Read
 app.get("/", token_validation, async (req, res) => {
-  const clubs = await Database(tables.clubs).select("*");
+  const clubs = await Database(tables.clubs).select("*").orderBy("id", "asc");
   return res.json({ data: clubs });
 });
 // Update
