@@ -9,6 +9,17 @@ exports.getFocusVariable = (str) => {
   return rows;
 };
 
+exports.getAtSignVariable = (str, excepts = []) => {
+  if (!str) return [];
+  const regex = /@(\w+)/g;
+  const matches = [];
+  let match;
+  while ((match = regex.exec(str))) {
+    if (!excepts.includes(match[1])) matches.push(match[1]);
+  }
+  return matches.map((v) => String(v).toLowerCase());
+};
+
 exports.sampleToHTML = (str) => {
   if (!str) return ""; // *bold* _italic_ ~strikethrough~ ```monospace```
   let result = String(str).split("\n").join("</br>"); // enter

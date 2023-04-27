@@ -7,37 +7,7 @@ const token_validation = require("../middlewares/token_validation");
 const Database = require("../apps/knex");
 const tables = require("../models/tables");
 
-// pagination
-app.get("/", token_validation, async (req, res) => {
-  let { page, show, search } = req.query;
-  page = page ?? 1;
-  show = show ?? 10;
-
-  const ids = await Database(tables.templates)
-    .where(function () {
-      if (search) {
-        this.whereRaw(
-          `LOWER(${tables.templates}.key) like '%` +
-            String(search).toLowerCase() +
-            "%'"
-        );
-      }
-    })
-    .pluck("id");
-  const total_data = ids.length;
-  let data = await Database(tables.templates)
-    .select("*")
-    .whereIn("id", ids)
-    .limit(show)
-    .offset((page - 1) * show);
-
-  return res.json({
-    data,
-    total_data,
-    total_page: Math.ceil(Number(total_data) / show),
-  });
-});
-
+// Create
 app.post("/", token_validation, async (req, res) => {
   let { key, sample, example } = req.body;
 
@@ -75,6 +45,38 @@ app.post("/", token_validation, async (req, res) => {
   });
 });
 
+// Read
+app.get("/", token_validation, async (req, res) => {
+  let { page, show, search } = req.query;
+  page = page ?? 1;
+  show = show ?? 10;
+
+  const ids = await Database(tables.templates)
+    .where(function () {
+      if (search) {
+        this.whereRaw(
+          `LOWER(${tables.templates}.key) like '%` +
+            String(search).toLowerCase() +
+            "%'"
+        );
+      }
+    })
+    .pluck("id");
+  const total_data = ids.length;
+  let data = await Database(tables.templates)
+    .select("*")
+    .whereIn("id", ids)
+    .limit(show)
+    .offset((page - 1) * show);
+
+  return res.json({
+    data,
+    total_data,
+    total_page: Math.ceil(Number(total_data) / show),
+  });
+});
+
+// Update
 app.put("/:key", token_validation, async (req, res) => {
   const { key } = req.params;
   let { sample, example } = req.body;
@@ -112,6 +114,7 @@ app.put("/:key", token_validation, async (req, res) => {
   });
 });
 
+// Delete
 app.delete("/:key", token_validation, async (req, res) => {
   const { key } = req.params;
 

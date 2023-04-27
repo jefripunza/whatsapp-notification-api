@@ -29,8 +29,11 @@ app.get("/", (_, res) => res.sendFile(path.join(frontend_dir, "index.html")));
 // api
 app.use(require("morgan")("dev"));
 app.use("/api/whatsapp", require("../modules/auth"));
-app.use("/api/whatsapp", require("../modules/templates"));
+app.use("/api/whatsapp", require("../modules/club"));
+app.use("/api/whatsapp", require("../modules/contact"));
+app.use("/api/whatsapp", require("../modules/group"));
 app.use("/api/whatsapp", require("../modules/send"));
+app.use("/api/whatsapp", require("../modules/templates"));
 
 // error handlers
 app.get("*", (req, res) => {

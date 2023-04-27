@@ -58,6 +58,10 @@ class WhatsApp {
         number: client.info.me.user,
         number_format: client.info.me._serialized,
       };
+      await client.sendMessage(
+        client.info.me._serialized,
+        "BOT IS ACTIVE IN SERVER!!!"
+      );
     });
     client.on("auth_failure", (msg) => {
       console.error("WhatsApp: AUTHENTICATION FAILURE", msg);

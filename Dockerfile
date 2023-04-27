@@ -33,7 +33,6 @@ RUN yarn install:fe
 RUN yarn build:fe
 
 # 💯 Last Configuration
-RUN npx knex migrate:latest
 RUN sed -i 's/localhost/host.docker.internal/g' .env
 
 # 🚀 Finish !!

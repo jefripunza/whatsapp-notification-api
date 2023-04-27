@@ -2,83 +2,117 @@ name: 🚀 Deploy App...
 
 # Controls when the workflow will run
 on: # master = production
-    # Triggers the workflow on push or pull request events but only for the "master" branch
-    push:
-        branches: ["master"] # master, development, staging
-    pull_request:
-        branches: ["master"] # master, development, staging
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  push:
+    branches: ["master"] # master, development, staging
+  pull_request:
+    branches: ["master"] # master, development, staging
 
-    # Allows you to run this workflow manually from the Actions tab
-    workflow_dispatch:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
-    app-deploy:
-        name: 🚚 WhatsApp Notification API - Microservice
-        runs-on: server-dell-jefri
-        steps:
-            - name: 🎉 Get latest code
-              uses: actions/checkout@v2
+  app-deploy:
+    name: 🚚 WhatsApp Notification API - Microservice
+    runs-on: server-dell-jefri
+    steps:
+      - name: 🎉 Get latest code
+        uses: actions/checkout@v2
 
-            - name: Rename ENV...
-              run: |
-                  mv .env.example .env
+      - name: Rename ENV...
+        run: |
+          mv .env.example .env
 
-            # ----------------------------------------------------------------------
-            # ----------------------------------------------------------------------
-            # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
 
-            - name: F&R - DASHBOARD_ROOT
-              uses: jacobtomlinson/gha-find-replace@v2
-              with:
-                  find: "DASHBOARD_ROOT="
-                  replace: "DASHBOARD_ROOT=${{ secrets.ENV_DASHBOARD_ROOT }}"
-                  regex: false
-                  include: ".env"
+      - name: F&R - DASHBOARD_ROOT
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "DASHBOARD_ROOT="
+          replace: "DASHBOARD_ROOT=${{ secrets.ENV_DASHBOARD_ROOT }}"
+          regex: false
+          include: ".env"
 
-            # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
 
-            - name: F&R - JWT_SECRET_TOKEN
-              uses: jacobtomlinson/gha-find-replace@v2
-              with:
-                  find: "JWT_SECRET_TOKEN="
-                  replace: "JWT_SECRET_TOKEN=${{ secrets.ENV_JWT_SECRET_TOKEN }}"
-                  regex: false
-                  include: ".env"
+      - name: F&R - JWT_SECRET_TOKEN
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "JWT_SECRET_TOKEN="
+          replace: "JWT_SECRET_TOKEN=${{ secrets.ENV_JWT_SECRET_TOKEN }}"
+          regex: false
+          include: ".env"
 
-            # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
 
-            - name: F&R - RABBIT_HOST
-              uses: jacobtomlinson/gha-find-replace@v2
-              with:
-                  find: "RABBIT_HOST="
-                  replace: "RABBIT_HOST=${{ secrets.ENV_RABBIT_HOST }}"
-                  regex: false
-                  include: ".env"
+      - name: F&R - ENV_DB_HOST
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: 'DB_HOST='
+          replace: 'DB_HOST=${{ secrets.ENV_DB_HOST }}'
+          regex: false
+          include: '.env'
 
-            # ----------------------------------------------------------------------
+      - name: F&R - ENV_DB_USER
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: 'DB_USER='
+          replace: 'DB_USER=${{ secrets.ENV_DB_USER }}'
+          regex: false
+          include: '.env'
 
-            # - name: F&R - REDIS_USER
-            #   uses: jacobtomlinson/gha-find-replace@v2
-            #   with:
-            #       find: "REDIS_USER="
-            #       replace: "REDIS_USER=${{ secrets.ENV_REDIS_USER }}"
-            #       regex: false
-            #       include: ".env"
+      - name: F&R - ENV_DB_PASS
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: 'DB_PASS='
+          replace: 'DB_PASS=${{ secrets.ENV_DB_PASS }}'
+          regex: false
+          include: '.env'
 
-            # - name: F&R - REDIS_PASS
-            #   uses: jacobtomlinson/gha-find-replace@v2
-            #   with:
-            #       find: "REDIS_PASS="
-            #       replace: "REDIS_PASS=${{ secrets.ENV_REDIS_PASS }}"
-            #       regex: false
-            #       include: ".env"
+      - name: F&R - ENV_DB_NAME
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: 'DB_NAME='
+          replace: 'DB_NAME=${{ secrets.ENV_DB_NAME }}'
+          regex: false
+          include: '.env'
 
-            # ----------------------------------------------------------------------
-            # ----------------------------------------------------------------------
-            # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
 
-            - name: 📡 Docker Compose...
-              run: |
-                  docker-compose pull
-                  docker-compose up --force-recreate --build -d
-                  docker image prune -f
+      - name: F&R - RABBIT_HOST
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "RABBIT_HOST="
+          replace: "RABBIT_HOST=${{ secrets.ENV_RABBIT_HOST }}"
+          regex: false
+          include: ".env"
+
+      # ----------------------------------------------------------------------
+
+      # - name: F&R - REDIS_USER
+      #   uses: jacobtomlinson/gha-find-replace@v2
+      #   with:
+      #       find: "REDIS_USER="
+      #       replace: "REDIS_USER=${{ secrets.ENV_REDIS_USER }}"
+      #       regex: false
+      #       include: ".env"
+
+      # - name: F&R - REDIS_PASS
+      #   uses: jacobtomlinson/gha-find-replace@v2
+      #   with:
+      #       find: "REDIS_PASS="
+      #       replace: "REDIS_PASS=${{ secrets.ENV_REDIS_PASS }}"
+      #       regex: false
+      #       include: ".env"
+
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+
+      - name: 📡 Docker Compose...
+        run: |
+          docker-compose pull
+          docker-compose up --force-recreate --build -d
+          docker image prune -f
