@@ -16,6 +16,23 @@ jobs:
     name: 🚚 WhatsApp Notification API - Microservice
     runs-on: server-dell-jefri
     steps:
+      - name: Get current date
+        run: |
+          echo "start_date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      - name: Send start report
+        run: |
+          curl --insecure --location '${{ secrets.REPORT_TARGET_URL }}' \
+            --header 'Content-Type: application/json' \
+            --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
+            --data '{
+                "phone_number": "${{ secrets.REPORT_PHONE_NUMBER }}",
+                "message": "${{ env.GITHUB_WORKFLOW }} starting with ${{ env.GITHUB_JOB }}/${{ env.GITHUB_RUN_NUMBER }}: ${{ env.GITHUB_JOB_STATUS }}\n#➥ *${{ steps.version.outputs.start_date }}*"
+            }'
+
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+      # ----------------------------------------------------------------------
+
       - name: 🎉 Get latest code
         uses: actions/checkout@v2
 
@@ -124,7 +141,7 @@ jobs:
       - name: Get current date
         if: success() || failure()
         run: |
-          echo "{date}={$(date +'%Y-%m-%d')}" >> $GITHUB_STATE
+          echo "end_date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       # If there is a success, send a report
       - name: Send success report
@@ -135,7 +152,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data '{
                 "phone_number": "${{ secrets.REPORT_PHONE_NUMBER }}",
-                "message": "${{ GITHUB_WORKFLOW }} deployed with ${{ GITHUB_JOB }}/${{ GITHUB_RUN_NUMBER }}: ${{ GITHUB_JOB_STATUS }}\n#➥ *${{ date }}*"
+                "message": "${{ env.GITHUB_WORKFLOW }} deployed with ${{ env.GITHUB_JOB }}/${{ env.GITHUB_RUN_NUMBER }}: ${{ env.GITHUB_JOB_STATUS }}\n#➥ *${{ steps.version.outputs.end_date }}*"
             }'
       # If there is a failure, send a report
       - name: Send failure report
@@ -146,7 +163,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data '{
                 "phone_number": "${{ secrets.REPORT_PHONE_NUMBER }}",
-                "message": "${{ GITHUB_WORKFLOW }} failed with ${{ GITHUB_JOB }}/${{ GITHUB_RUN_NUMBER }}: ${{ GITHUB_JOB_STATUS }}\n#➥ *${{ date }}*"
+                "message": "${{ env.GITHUB_WORKFLOW }} failed with ${{ env.GITHUB_JOB }}/${{ env.GITHUB_RUN_NUMBER }}: ${{ env.GITHUB_JOB_STATUS }}\n#➥ *${{ steps.version.outputs.end_date }}*"
             }'
 
       # ----------------------------------------------------------------------
