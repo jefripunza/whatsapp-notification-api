@@ -34,7 +34,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"*➥ REPORTER*\n#OWNER: *${{ github.repository_owner }}*\n#REPO: *${{ github.event.repository.name }}*\n#PUSHER: *${{ github.event.pusher.name }}*\n#RUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n#STATUS: *STARING* 🛫\n#TIME: *${{ env.start_date }}*\"
+              \"message\": \"*➥ REPORTER*\n#OWNER: *${{ github.repository_owner }}*\n#REPO: *${{ github.event.repository.name }}*\n#BRANCH: *${{ github.ref_name }}*\n#PUSHER: *${{ github.event.pusher.name }}*\n#RUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n#STATUS: *STARING* 🛫\n#TIME: *${{ env.start_date }}*\"
             }"
 
       # ----------------------------------------------------------------------
@@ -164,7 +164,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"*➥ REPORTER*\n#OWNER: *${{ github.repository_owner }}*\n#REPO: *${{ github.event.repository.name }}*\n#PUSHER: *${{ github.event.pusher.name }}*\n#RUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n#STATUS: *DEPLOYED* ✈️✅\n#TIME: *${{ env.start_date }}*\"
+              \"message\": \"*➥ REPORTER*\n#OWNER: *${{ github.repository_owner }}*\n#REPO: *${{ github.event.repository.name }}*\n#BRANCH: *${{ github.ref_name }}*\n#PUSHER: *${{ github.event.pusher.name }}*\n#RUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n#STATUS: *DEPLOYED* ✈️✅\n#TIME: *${{ env.start_date }}*\"
             }"
       # If there is a failure, send a report
       - name: Send failure report
@@ -175,7 +175,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"*➥ REPORTER*\n#OWNER: *${{ github.repository_owner }}*\n#REPO: *${{ github.event.repository.name }}*\n#PUSHER: *${{ github.event.pusher.name }}*\n#RUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n#STATUS: *FAILURE* ❌\n#TIME: *${{ env.start_date }}*\"
+              \"message\": \"*➥ REPORTER*\n#OWNER: *${{ github.repository_owner }}*\n#REPO: *${{ github.event.repository.name }}*\n#BRANCH: *${{ github.ref_name }}*\n#PUSHER: *${{ github.event.pusher.name }}*\n#RUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n#STATUS: *FAILURE* ❌\n#TIME: *${{ env.start_date }}*\"
             }"
       # If there is a cancelled, send a report
       - name: Send cancelled report
@@ -186,7 +186,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"*➥ REPORTER*\n#OWNER: *${{ github.repository_owner }}*\n#REPO: *${{ github.event.repository.name }}*\n#PUSHER: *${{ github.event.pusher.name }}*\n#RUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n#STATUS: *CANCEL* ⛔\n#TIME: *${{ env.start_date }}*\"
+              \"message\": \"*➥ REPORTER*\n#OWNER: *${{ github.repository_owner }}*\n#REPO: *${{ github.event.repository.name }}*\n#BRANCH: *${{ github.ref_name }}*\n#PUSHER: *${{ github.event.pusher.name }}*\n#RUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n#STATUS: *CANCEL* ⛔\n#TIME: *${{ env.start_date }}*\"
             }"
 
       # ----------------------------------------------------------------------
