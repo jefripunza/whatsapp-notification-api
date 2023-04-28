@@ -28,6 +28,8 @@ module.exports = async (validate_object) => {
         isOnLeave = isOnLeave ? true : String(text).includes("oniseave");
         isOnLeave = isOnLeave ? true : String(text).includes("on (eave");
         isOnLeave = isOnLeave ? true : String(text).includes("on .leava");
+        isOnLeave = isOnLeave ? true : String(text).includes("ave");
+        isOnLeave = isOnLeave ? true : String(text).includes("on");
 
         return {
           id,
