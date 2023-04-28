@@ -23,7 +23,7 @@ jobs:
       - name: Set Time Zone & Template
         run: |
           TZ=Asia/Jakarta
-          echo "template_top="*➥ REPORTER (${{ github.run_number }})*\n\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n"" >> ${GITHUB_ENV}
+          echo "template_top=\"*➥ REPORTER (${{ github.run_number }})*\n\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n\"" >> ${GITHUB_ENV}
 
       - name: Get start datetime
         run: |
