@@ -35,6 +35,7 @@ app.use("/api/whatsapp", require("../modules/group"));
 app.use("/api/whatsapp", require("../modules/send"));
 app.use("/api/whatsapp", require("../modules/task"));
 app.use("/api/whatsapp", require("../modules/templates"));
+app.use("/api/whatsapp", require("../modules/validate"));
 
 // error handlers
 app.get("*", (req, res) => {
