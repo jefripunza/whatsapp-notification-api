@@ -13,21 +13,24 @@ on: # master = production
 
 env:
   SNAPSHOT_VERSION: ${{ format('{0}-SNAPSHOT', github.event.number) }}
-  # TEMPLATE_INFO: "*➥ REPORTER (${{ github.run_number }})*\n\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n"
 
 jobs:
   app-deploy:
     name: 🚚 WhatsApp Notification API - Microservice
     runs-on: server-dell-jefri
     steps:
-      - name: Set Time Zone & Template
+      - uses: ReeganExE/github-action-job-id@v1.0
+        with:
+          expose-name: true
+
+      - name: Set Time Zone, Get start datetime & Template Top
         run: |
           TZ=Asia/Jakarta
-          echo "template_top=*➥ REPORTER (${{ github.run_number }})*\n\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n" >> ${GITHUB_ENV}
-
-      - name: Get start datetime
-        run: |
           echo "start_date=$(date +"%Y-%m-%d %T")" >> ${GITHUB_ENV}
+
+          echo "template_top=*➥ REPORTER (${{ github.run_number }})*\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n" >> ${GITHUB_ENV}
+          echo "template_bottom=Please check https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/actions/runs/${{ github.run_id }}/jobs/${{ env.GH_JOB_0_ID }}" >> ${GITHUB_ENV}
+
       - name: Send start report
         run: |
           curl --insecure --location '${{ secrets.REPORT_TARGET_URL }}' \
@@ -137,9 +140,9 @@ jobs:
       # ----------------------------------------------------------------------
       # ----------------------------------------------------------------------
 
-      # - name: Test Error
-      #   run: |
-      #     anu
+      - name: Test Error
+        run: |
+          anu
 
       - name: 📡 Docker Compose...
         run: |
@@ -176,7 +179,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"${{ env.template_top }}STATUS: *FAILURE* 🛬❌\nTIME: *${{ env.end_date }}*\"
+              \"message\": \"${{ env.template_top }}STATUS: *FAILURE* 🛬❌\nTIME: *${{ env.end_date }}*\n\n${{ env.template_bottom }}\"
             }"
       # If there is a cancelled, send a report
       - name: Send cancelled report
@@ -187,7 +190,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"${{ env.template_top }}STATUS: *CANCEL* 🛬⛔\nTIME: *${{ env.end_date }}*\"
+              \"message\": \"${{ env.template_top }}STATUS: *CANCEL* 🛬⛔\nTIME: *${{ env.end_date }}*\n\n${{ env.template_bottom }}\"
             }"
 
       # ----------------------------------------------------------------------
