@@ -13,17 +13,17 @@ on: # master = production
 
 env:
   SNAPSHOT_VERSION: ${{ format('{0}-SNAPSHOT', github.event.number) }}
-  GITHUB_ISSUE_NUMBER: ${{ github.event.number }}
-  TEMPLATE_INFO: "*➥ REPORTER (${{ github.run_number }})*\n\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n"
+  # TEMPLATE_INFO: "*➥ REPORTER (${{ github.run_number }})*\n\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n"
 
 jobs:
   app-deploy:
     name: 🚚 WhatsApp Notification API - Microservice
     runs-on: server-dell-jefri
     steps:
-      - name: Set Time Zone
+      - name: Set Time Zone & Template
         run: |
           TZ=Asia/Jakarta
+          echo "template_top="*➥ REPORTER (${{ github.run_number }})*\n\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n"" >> ${GITHUB_ENV}
 
       - name: Get start datetime
         run: |
@@ -35,7 +35,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"${{ env.TEMPLATE_INFO }}STATUS: *STARING* 🛫📡\nTIME: *${{ env.start_date }}*\"
+              \"message\": \"${{ env.template_top }}STATUS: *STARING* 🛫📡\nTIME: *${{ env.start_date }}*\"
             }"
 
       # ----------------------------------------------------------------------
@@ -165,7 +165,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"${{ env.TEMPLATE_INFO }}STATUS: *DEPLOYED* ✈️✅\nTIME: *${{ env.end_date }}*\"
+              \"message\": \"${{ env.template_top }}STATUS: *DEPLOYED* ✈️✅\nTIME: *${{ env.end_date }}*\"
             }"
       # If there is a failure, send a report
       - name: Send failure report
@@ -176,7 +176,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"${{ env.TEMPLATE_INFO }}STATUS: *FAILURE* 🛬❌\nTIME: *${{ env.end_date }}*\"
+              \"message\": \"${{ env.template_top }}STATUS: *FAILURE* 🛬❌\nTIME: *${{ env.end_date }}*\"
             }"
       # If there is a cancelled, send a report
       - name: Send cancelled report
@@ -187,7 +187,7 @@ jobs:
             --header 'Authorization: Bearer ${{ secrets.REPORT_BEARER_TOKEN }}' \
             --data-raw "{
               \"phone_number\": \"${{ secrets.REPORT_PHONE_NUMBER }}\",
-              \"message\": \"${{ env.TEMPLATE_INFO }}STATUS: *CANCEL* 🛬⛔\nTIME: *${{ env.end_date }}*\"
+              \"message\": \"${{ env.template_top }}STATUS: *CANCEL* 🛬⛔\nTIME: *${{ env.end_date }}*\"
             }"
 
       # ----------------------------------------------------------------------
