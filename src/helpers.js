@@ -1,6 +1,28 @@
 exports.delay = async (timeout = 3000) =>
   await new Promise((resolve) => setTimeout(resolve, timeout));
 
+/**
+ * @callback processingCallback
+ * @param {*} row - show per item.
+ * @param {number} i - number of increment
+ * @returns {Promise}
+ */
+/**
+ * @param {any[]} array
+ * @param {processingCallback} processing
+ * @returns {Promise}
+ */
+exports.createPromise = async (array, processing) => {
+  let i = 0;
+  const result = [];
+  while (i < array.length) {
+    const row = array[i];
+    result.push(await processing(row, i));
+    i++;
+  }
+  return result;
+};
+
 exports.getFocusVariable = (str) => {
   if (!str) return [];
   let rows = String(str).match(/#(\w+)#/g);

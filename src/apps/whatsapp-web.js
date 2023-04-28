@@ -9,7 +9,6 @@ const {
   List,
   Buttons,
 } = require("whatsapp-web.js");
-const locateChrome = require("locate-chrome");
 
 const qrcode = require("qrcode-terminal");
 const qr_image = require("qr-image");
@@ -113,6 +112,10 @@ class WhatsApp {
       console.log({ media });
     }
   }
+
+  // async getProfilePicture(){
+  //   return this.client.getProfilePicUrl()
+  // }
 
   /**
    * Send Media

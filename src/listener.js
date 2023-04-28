@@ -3,7 +3,7 @@ const SocketIO = require("socket.io");
 const qr_image = require("qr-image");
 const jwt = require("./utils/jwt");
 
-const { delay, getAtSignVariable } = require("../src/helpers");
+const { createPromise, getAtSignVariable } = require("../src/helpers");
 
 const Database = require("./apps/knex");
 const tables = require("./models/tables");
@@ -13,6 +13,8 @@ const {
   MENTION_EVERYONE_EXCHANGE,
   MENTION_PARTIAL_EXCHANGE,
 } = require("./exchange-queue");
+
+const onLeave = require("./utils/onleave");
 
 /**
  * WhatsApp Listener
@@ -84,6 +86,12 @@ module.exports = (client, io) => {
         name: chat.name,
         id_serialized: chat.id._serialized,
       };
+      /**
+       * @type{string[]}
+       */
+      let participants_serialized = chat.participants.map(
+        (participant) => participant.id._serialized
+      );
 
       // penjagaan processing dan kebutuhan sync contact
       const isGroupExist = await Database(tables.groups)
@@ -129,6 +137,7 @@ module.exports = (client, io) => {
       }
 
       /**
+       * Get Club if Available
        * @type{string[]}
        */
       let club_available = [];
@@ -139,6 +148,7 @@ module.exports = (client, io) => {
       }
 
       // limiter
+      let list_on_leave = [];
       if (String(text).includes("@everyone") || club_available.length > 0) {
         if (!msg.fromMe) {
           const requests = await Database(tables.request_limiter)
@@ -160,6 +170,35 @@ module.exports = (client, io) => {
             // limit
             return;
           }
+
+          // if on leave
+          let profile_pictures = await createPromise(
+            participants_serialized,
+            async (id_serialized, i) => {
+              return {
+                id_serialized,
+                image: await client.getProfilePicUrl(id_serialized),
+              };
+            }
+          );
+          profile_pictures = profile_pictures.reduce(
+            (simpan, { id_serialized, image }) => {
+              return {
+                ...simpan,
+                [id_serialized]: image,
+              };
+            },
+            {}
+          );
+          list_on_leave = await onLeave(profile_pictures);
+          participants_serialized = participants_serialized.filter(
+            (participant) => {
+              const participant_match = list_on_leave.find(
+                (v) => v.id == participant
+              );
+              return !participant_match.isOnLeave;
+            }
+          );
         }
       }
 
@@ -181,11 +220,9 @@ module.exports = (client, io) => {
             `${tables.club_of_contact}.id_club`
           )
           .whereIn(`${tables.clubs}.name`, club_available);
-        const get_serialized = chat.participants.map(
-          (participant) => participant.id._serialized
-        );
-        contacts = contacts.filter((contact) =>
-          get_serialized.includes(contact.number_serialized)
+        contacts = contacts.filter(
+          (contact) =>
+            participants_serialized.includes(contact.number_serialized) // pake yg nggak on leave
         );
         const club_of_contact = contacts.reduce((simpan, contact) => {
           const { club_name, number_serialized } = contact;
@@ -229,16 +266,15 @@ module.exports = (client, io) => {
         if (String(text).includes("@everyone")) {
           let mentions = [];
           let text = "╠➥ 🚨🚨🚨 Hadirlah wahai kalian makhluk bumi 🚨🚨🚨\n";
-          for (let participant of chat.participants) {
-            const contact = await client.getContactById(
-              participant.id._serialized
-            );
+          // pake yg nggak on leave
+          for (let participant of participants_serialized) {
+            const contact = await client.getContactById(participant);
             mentions.push({
               id: {
                 _serialized: contact.id._serialized,
               },
             });
-            text += `@${participant.id.user} `;
+            text += `@${String(participant).split("@")[0]} `;
           }
           text += "\n╚═〘 JeJep BOT 〙";
           const Rabbit = new RabbitMQ();

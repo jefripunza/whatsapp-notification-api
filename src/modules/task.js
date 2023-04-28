@@ -7,17 +7,31 @@ const token_validation = require("../middlewares/token_validation");
 const RabbitMQ = require("../apps/rabbitmq");
 const { MESSAGE_REQUESTS_EXCHANGE } = require("../exchange-queue");
 
+const cron = require("node-cron");
+/**
+ * @type{cron.ScheduleOptions}
+ */
+const options = {
+  scheduled: false,
+  timezone: "Asia/Jakarta",
+};
+/**
+ * @param {string} cronExpression 
+ * @param {function} func 
+ * @returns 
+ */
+const schedule = (cronExpression, func) =>
+  cron.schedule(cronExpression, func, options);
+const tasks = {};
+
 const Database = require("../apps/knex");
 const tables = require("../models/tables");
-
-const cron = require("node-cron");
-const tasks = {};
 
 // ==========================================================================
 // ==========================================================================
 
 tasks["test"] = {
-  task: cron.schedule("* * * * *", async () => {
+  task: schedule("* * * * *", async () => {
     const now = new Date();
     console.log("test task", { now: now.toString() });
   }),
@@ -25,7 +39,7 @@ tasks["test"] = {
 };
 
 tasks["daily_scrum"] = {
-  task: cron.schedule("0 10 * * 1-5", async () => {
+  task: schedule("0 10 * * 1-5", async () => {
     const now = new Date();
     const Rabbit = new RabbitMQ();
     await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
