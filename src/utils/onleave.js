@@ -2,6 +2,43 @@ const Tesseract = require("tesseract.js");
 
 const { createPromise } = require("../helpers");
 
+const ReadText = async (
+  imgfile,
+  tessedit_ocr_engine_mode = 2,
+  tessedit_pageseg_mode = 3
+) => {
+  try {
+    return await new Promise(async (resolve, reject) => {
+      const worker = await Tesseract.createWorker({
+        // logger: (m) => console.log(m),
+      });
+      worker.loadLanguage("eng+osd").then(() => {
+        worker.initialize("eng+osd").then(() => {
+          worker
+            .setParameters({
+              tessedit_ocr_engine_mode,
+              tessedit_pageseg_mode,
+              tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+            })
+            .then(() => {
+              worker
+                .recognize(imgfile, {
+                  tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+                })
+                .then(({ data: { text } }) => {
+                  // console.log(text)
+                  resolve(text);
+                })
+                .finally(() => {});
+            });
+        });
+      });
+    });
+  } catch (e) {
+    return `An error occurred: ${e}`;
+  }
+};
+
 module.exports = async (validate_object) => {
   const validate_array = Object.keys(validate_object).map((key) => {
     return {
@@ -19,8 +56,8 @@ module.exports = async (validate_object) => {
         };
       }
       try {
-        const result = await Tesseract.recognize(image);
-        const text = String(result.data.text).toLowerCase().replace(/\n/g, "");
+        const result = await ReadText(image);
+        const text = String(result).toLowerCase().replace(/\n/g, "");
 
         let isOnLeave = String(text).includes("on leave");
         isOnLeave = isOnLeave ? true : String(text).includes("onleave");

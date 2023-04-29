@@ -23,7 +23,7 @@ jobs:
         run: |
           TZ=Asia/Jakarta
           echo "start_date=$(date +"%Y-%m-%d %T")" >> ${GITHUB_ENV}
-          echo "template_top=*➥ REPORTER (${{ github.run_number }})*\n#GIT INFO...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n" >> ${GITHUB_ENV}
+          echo "template_top=*➥ REPORTER (${{ github.run_number }})*\n#GIT...\nREPO: *${{ github.event.repository.name }}*\nBRANCH: *${{ github.ref_name }}*\n#USER...\nOWNER: *${{ github.repository_owner }}*\nPUSHER: *${{ github.event.pusher.name }}*\n#SERVER...\nRUNNER: *${{ runner.name }} (${{ runner.os }} ${{ runner.arch }})*\n" >> ${GITHUB_ENV}
           echo "template_bottom=Please check https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/actions/runs/${{ github.run_id }}" >> ${GITHUB_ENV}
 
       - name: Send start report

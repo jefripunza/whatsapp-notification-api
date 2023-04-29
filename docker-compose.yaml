@@ -10,9 +10,15 @@ services:
         volumes:
             # setup file or folder public
             - whatsapp-notification-api-service:/app/.wwebjs_auth
+            - eng.traineddata:/app/eng.traineddata
+            - osd.traineddata:/app/osd.traineddata
         network_mode: bridge
         extra_hosts:
             - "host.docker.internal:host-gateway"
 volumes:
     whatsapp-notification-api-service:
+        external: false
+    eng.traineddata:
+        external: false
+    osd.traineddata:
         external: false
