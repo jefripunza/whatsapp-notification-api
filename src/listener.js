@@ -171,34 +171,34 @@ module.exports = (client, io) => {
             return;
           }
 
-          // if on leave
-          let profile_pictures = await createPromise(
-            participants_serialized,
-            async (id_serialized, i) => {
-              return {
-                id_serialized,
-                image: await client.getProfilePicUrl(id_serialized),
-              };
-            }
-          );
-          profile_pictures = profile_pictures.reduce(
-            (simpan, { id_serialized, image }) => {
-              return {
-                ...simpan,
-                [id_serialized]: image,
-              };
-            },
-            {}
-          );
-          list_on_leave = await onLeave(profile_pictures);
-          participants_serialized = participants_serialized.filter(
-            (participant) => {
-              const participant_match = list_on_leave.find(
-                (v) => v.id == participant
-              );
-              return !participant_match.isOnLeave;
-            }
-          );
+          // if on leave (OCR)
+          // let profile_pictures = await createPromise(
+          //   participants_serialized,
+          //   async (id_serialized, i) => {
+          //     return {
+          //       id_serialized,
+          //       image: await client.getProfilePicUrl(id_serialized),
+          //     };
+          //   }
+          // );
+          // profile_pictures = profile_pictures.reduce(
+          //   (simpan, { id_serialized, image }) => {
+          //     return {
+          //       ...simpan,
+          //       [id_serialized]: image,
+          //     };
+          //   },
+          //   {}
+          // );
+          // list_on_leave = await onLeave(profile_pictures);
+          // participants_serialized = participants_serialized.filter(
+          //   (participant) => {
+          //     const participant_match = list_on_leave.find(
+          //       (v) => v.id == participant
+          //     );
+          //     return !participant_match.isOnLeave;
+          //   }
+          // );
         }
       }
 
