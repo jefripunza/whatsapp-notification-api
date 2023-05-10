@@ -50,12 +50,25 @@ tasks["daily_scrum"] = {
       }).then((res) => res.data);
       const isHoliday = result
         .filter((v) => v.is_national_holiday)
-        .find(({ holiday_date }) => date == String(holiday_date).split("-")[2]);
+        .find(
+          ({ holiday_date }) =>
+            date == parseInt(String(holiday_date).split("-")[2])
+        );
+
+      const Rabbit = new RabbitMQ();
+
       if (isHoliday) {
+        await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
+          phone_number: "120363021874096561@g.us", // mendaki
+          message: `║ "LIBUR WOY NGGA KERJA" 🚨🚨🚨🚨🚨🚨\n╠➥ *${
+            isHoliday.holiday_name
+          }* \n╠➥ ${now.getDate()}/${
+            now.getMonth() + 1
+          }/${now.getFullYear()} \n╚═〘 JeJep BOT 〙`,
+        });
         return; // skip DS !!
       }
 
-      const Rabbit = new RabbitMQ();
       await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
         phone_number: "120363021874096561@g.us", // mendaki
         // phone_number: "120363130562078659@g.us", // testing bot
