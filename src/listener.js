@@ -16,6 +16,8 @@ const {
 
 const onLeave = require("./utils/onleave");
 
+const list_tag_all_cmd = ["@everyone", "@here"];
+
 /**
  * WhatsApp Listener
  * @param {WAWebJS.Client} client
@@ -143,13 +145,18 @@ module.exports = (client, io) => {
       let club_available = [];
       if (String(text).includes("@")) {
         const clubs = await Database(tables.clubs).pluck("name");
-        const at_sign = getAtSignVariable(text, ["everyone"]);
+        const at_sign = getAtSignVariable(text, ["everyone", "here"]);
         club_available = clubs.filter((club) => at_sign.includes(club));
       }
 
       // limiter
       let list_on_leave = [];
-      if (String(text).includes("@everyone") || club_available.length > 0) {
+      if (
+        list_tag_all_cmd.some((tag_all_cmd) =>
+          String(text).includes(tag_all_cmd)
+        ) ||
+        club_available.length > 0
+      ) {
         if (!msg.fromMe) {
           const requests = await Database(tables.request_limiter)
             .where("number_serialized", participant_serialized)
@@ -263,7 +270,11 @@ module.exports = (client, io) => {
           mentions,
         });
       } else {
-        if (String(text).includes("@everyone")) {
+        if (
+          list_tag_all_cmd.some((tag_all_cmd) =>
+            String(text).includes(tag_all_cmd)
+          )
+        ) {
           let mentions = [];
           let text = "╠➥ 🚨🚨🚨 Hadirlah wahai kalian makhluk bumi 🚨🚨🚨\n";
           // pake yg nggak on leave
