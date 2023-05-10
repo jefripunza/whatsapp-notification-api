@@ -16,9 +16,9 @@ const options = {
   timezone: "Asia/Jakarta",
 };
 /**
- * @param {string} cronExpression 
- * @param {function} func 
- * @returns 
+ * @param {string} cronExpression
+ * @param {function} func
+ * @returns
  */
 const schedule = (cronExpression, func) =>
   cron.schedule(cronExpression, func, options);
@@ -41,14 +41,32 @@ tasks["test"] = {
 tasks["daily_scrum"] = {
   task: schedule("0 10 * * 1-5", async () => {
     const now = new Date();
-    const Rabbit = new RabbitMQ();
-    await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
-      phone_number: "120363021874096561@g.us", // mendaki
-      // phone_number: "120363130562078659@g.us", // testing bot
-      message: `║ Kuy2 @DS 🚨🚨🚨🚨🚨🚨\n╠➥ ${now.getDate()}/${
-        now.getMonth() + 1
-      }/${now.getFullYear()} \n╚═〘 JeJep BOT 〙`,
-    });
+    try {
+      const date = now.getDate(),
+        month = now.getMonth() + 1,
+        year = now.getFullYear();
+      const result = await axios({
+        url: `https://api-harilibur.vercel.app/api?month=${month}&year=${year}`,
+      }).then((res) => res.data);
+      const isHoliday = result
+        .filter((v) => v.is_national_holiday)
+        .find(({ holiday_date }) => date == String(holiday_date).split("-")[2]);
+      if (isHoliday) {
+        return; // skip DS !!
+      }
+
+      const Rabbit = new RabbitMQ();
+      await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
+        phone_number: "120363021874096561@g.us", // mendaki
+        // phone_number: "120363130562078659@g.us", // testing bot
+        message: `║ Kuy2 @DS 🚨🚨🚨🚨🚨🚨\n╠➥ ${now.getDate()}/${
+          now.getMonth() + 1
+        }/${now.getFullYear()} \n╚═〘 JeJep BOT 〙`,
+      });
+    } catch (error) {
+      console.log({ error });
+      return;
+    }
   }),
   status: true,
 };
