@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const app = express.Router();
 
+const axios = require("axios");
+
 const token_validation = require("../middlewares/token_validation");
 
 const RabbitMQ = require("../apps/rabbitmq");
