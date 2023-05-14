@@ -41,6 +41,10 @@ app.post("/message/raw", token_validation, async (req, res) => {
       message: "body is'n complete!",
     });
   }
+  console.log("/message/raw", {
+    phone_number,
+    message,
+  });
 
   const { is_ready, is_authenticated, client, formatter } = global.whatsapp;
   if (!is_ready || !is_authenticated) {
