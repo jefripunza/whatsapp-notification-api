@@ -83,3 +83,5 @@ exports.sampleToHTML = (str) => {
   }
   return result;
 };
+
+exports.onlyNumber = (str) => str.replace(/[^0-9]/g, "");

@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const app = express.Router();
+const { onlyNumber } = require("../helpers");
 
 const token_validation = require("../middlewares/token_validation");
 
-app.get("/is-register/:phone_number", token_validation, async (req, res) => {
+app.get("/is-register/:phone_number", async (req, res) => {
   const { phone_number } = req.params;
 
   const { is_ready, is_authenticated, client, formatter } = global.whatsapp;
@@ -13,7 +14,8 @@ app.get("/is-register/:phone_number", token_validation, async (req, res) => {
       message: "whatsapp is'n ready!",
     });
   }
-  phone_number = formatter(phone_number);
+
+  phone_number = formatter(onlyNumber(phone_number));
   const register = await client.isRegisteredUser(phone_number);
   return res.json({ register });
 });
