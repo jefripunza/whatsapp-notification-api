@@ -6,7 +6,7 @@ const { onlyNumber } = require("../helpers");
 const token_validation = require("../middlewares/token_validation");
 
 app.get("/is-register/:phone_number", async (req, res) => {
-  const { phone_number } = req.params;
+  let { phone_number } = req.params;
 
   const { is_ready, is_authenticated, client, formatter } = global.whatsapp;
   if (!is_ready || !is_authenticated) {
