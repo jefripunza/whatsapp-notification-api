@@ -13,9 +13,8 @@ module.exports = () => {
           done();
           return;
         }
-        await delay(3000);
         await client.sendMessage(id_serialized, text, { mentions });
-        done();
+        await delay(3000);
       } catch (error) {
         console.log("message-request", { error });
       } finally {
