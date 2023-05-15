@@ -7,14 +7,20 @@ module.exports = () => {
   Rabbit.listen(
     MENTION_EVERYONE_QUEUE,
     async ({ id_serialized, text, mentions }, done, dead) => {
-      const { is_ready, is_authenticated, client } = global.whatsapp;
-      if (!is_ready || !is_authenticated) {
+      try {
+        const { is_ready, is_authenticated, client } = global.whatsapp;
+        if (!is_ready || !is_authenticated) {
+          done();
+          return;
+        }
+        await delay(3000);
+        await client.sendMessage(id_serialized, text, { mentions });
         done();
-        return;
+      } catch (error) {
+        console.log("message-request", { error });
+      } finally {
+        done();
       }
-      await delay(3000);
-      await client.sendMessage(id_serialized, text, { mentions });
-      done();
     }
   );
 };
