@@ -12,7 +12,7 @@ const tables = require("../models/tables");
 
 const { getFocusVariable } = require("../helpers");
 
-app.post("/message/report", token_validation, async (req, res) => {
+app.post("/message-report", token_validation, async (req, res) => {
   let { phone_number, message } = req.body;
   if (!(phone_number && message)) {
     return res.status(400).json({
