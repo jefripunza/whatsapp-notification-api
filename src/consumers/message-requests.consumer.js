@@ -15,9 +15,9 @@ module.exports = () => {
         }
         await client.sendMessage(phone_number, message);
         await delay(5000);
+        done();
       } catch (error) {
         console.log("message-request", { error });
-      } finally {
         done();
       }
     }

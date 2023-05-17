@@ -17,9 +17,8 @@ module.exports = () => {
         await delay(3000);
       } catch (error) {
         console.log("message-request", { error });
-      } finally {
-        done();
       }
+      done();
     }
   );
 };
