@@ -41,19 +41,30 @@ class RabbitMQ {
   };
 
   async #run_consumers() {
-    if (!fs.existsSync(consumers_dir)) return;
-    await fs
-      .readdirSync(consumers_dir)
-      .filter((consumer_filename) => !String(consumer_filename).startsWith("#"))
-      .forEach(async (consumer_filename) => {
-        const consumer_name = String(consumer_filename)
-          .split(".")[0]
-          .split("-")
-          .map((v) => String(v)[0].toUpperCase() + String(v).slice(1))
-          .join(" ");
-        require(path.join(consumers_dir, consumer_filename))(); // execute
-        console.log(`✅ Consumer : ${consumer_name} is Ready!`);
-      });
+    const run = async () => {
+      if (!fs.existsSync(consumers_dir)) return;
+      await fs
+        .readdirSync(consumers_dir)
+        .filter(
+          (consumer_filename) => !String(consumer_filename).startsWith("#")
+        )
+        .forEach(async (consumer_filename) => {
+          const consumer_name = String(consumer_filename)
+            .split(".")[0]
+            .split("-")
+            .map((v) => String(v)[0].toUpperCase() + String(v).slice(1))
+            .join(" ");
+          require(path.join(consumers_dir, consumer_filename))(); // execute
+          console.log(`✅ Consumer : ${consumer_name} is Ready!`);
+        });
+    };
+    const interval = setInterval(() => {
+      const whatsapp = global.whatsapp;
+      if (whatsapp) {
+        run();
+        clearInterval(interval);
+      }
+    }, 1000);
   }
 
   /**
