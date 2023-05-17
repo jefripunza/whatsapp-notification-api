@@ -64,8 +64,8 @@ jobs:
 
           sed -i 's/RABBIT_HOST=/RABBIT_HOST=${{ secrets.ENV_RABBIT_HOST }}/g' .env
 
-        # sed -i 's/REDIS_USER=/REDIS_USER=${{ secrets.ENV_REDIS_USER }}/g' .env
-        # sed -i 's/REDIS_PASS=/REDIS_PASS=${{ secrets.ENV_REDIS_PASS }}/g' .env
+      # sed -i 's/REDIS_USER=/REDIS_USER=${{ secrets.ENV_REDIS_USER }}/g' .env
+      # sed -i 's/REDIS_PASS=/REDIS_PASS=${{ secrets.ENV_REDIS_PASS }}/g' .env
 
       # ----------------------------------------------------------------------
       # ----------------------------------------------------------------------
