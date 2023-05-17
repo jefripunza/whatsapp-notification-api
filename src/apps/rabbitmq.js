@@ -59,8 +59,7 @@ class RabbitMQ {
         });
     };
     const interval = setInterval(() => {
-      const whatsapp = global.whatsapp;
-      if (whatsapp) {
+      if (global?.whatsapp != undefined) {
         run();
         clearInterval(interval);
       }

@@ -72,6 +72,7 @@ class WhatsApp {
       process.exit(1);
     });
 
+    console.log({ client });
     this.client = client;
     global.whatsapp = this;
   }
