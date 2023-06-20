@@ -40,8 +40,47 @@ tasks["test"] = {
   status: false,
 };
 
+tasks["holiday"] = {
+  task: schedule("0 7 * * 1-5", async () => {
+    const now = new Date();
+    try {
+      const date = now.getDate(),
+        month = now.getMonth() + 1,
+        year = now.getFullYear();
+      const result = await axios({
+        url: `https://api-harilibur.vercel.app/api?month=${month}&year=${year}`,
+      }).then((res) => res.data);
+      const isHoliday = result
+        .filter((v) => v.is_national_holiday)
+        .find(
+          ({ holiday_date }) =>
+            date == parseInt(String(holiday_date).split("-")[2])
+        );
+
+      const Rabbit = new RabbitMQ();
+
+      if (isHoliday) {
+        await Rabbit.send(MESSAGE_REQUESTS_EXCHANGE, {
+          phone_number: "120363021874096561@g.us", // mendaki
+          message: `║ "LIBUR KERJA KITA HARI INI" 🚨🚨🚨🚨🚨🚨\n╠➥ *${
+            isHoliday.holiday_name
+          }* \n╠➥ ${now.getDate()}/${
+            now.getMonth() + 1
+          }/${now.getFullYear()} \n╚═〘 JeJep BOT 〙`,
+        });
+        return; // skip DS !!
+      }
+      return;
+    } catch (error) {
+      console.log({ error });
+      return;
+    }
+  }),
+  status: true,
+};
+
 tasks["daily_scrum"] = {
-  task: schedule("0 10 * * 1-5", async () => {
+  task: schedule("0 10 * * 1,3,4,5", async () => {
     const now = new Date();
     try {
       const date = now.getDate(),
@@ -66,7 +105,7 @@ tasks["daily_scrum"] = {
             isHoliday.holiday_name
           }* \n╠➥ ${now.getDate()}/${
             now.getMonth() + 1
-          }/${now.getFullYear()} \n╚═〘 JeJep BOT 〙`,
+          }/${now.getFullYear()}\n╚═〘 JeJep BOT 〙`,
         });
         return; // skip DS !!
       }
@@ -76,7 +115,7 @@ tasks["daily_scrum"] = {
         // phone_number: "120363130562078659@g.us", // testing bot
         message: `║ Kuy2 @DS 🚨🚨🚨🚨🚨🚨\n╠➥ ${now.getDate()}/${
           now.getMonth() + 1
-        }/${now.getFullYear()} \n╚═〘 JeJep BOT 〙`,
+        }/${now.getFullYear()}\n╚═〘 JeJep BOT 〙`,
       });
     } catch (error) {
       console.log({ error });

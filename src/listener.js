@@ -261,7 +261,7 @@ module.exports = (client, io) => {
           }
           text += "\n\n";
         }
-        text += "\n╚═〘 JeJep BOT 〙";
+        text += "╚═〘 JeJep BOT 〙";
         if (mentions.length == 0) return; // skip, nggak ada yg di mention...
         const Rabbit = new RabbitMQ();
         await Rabbit.send(MENTION_PARTIAL_EXCHANGE, {
